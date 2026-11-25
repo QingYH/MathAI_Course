@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第一讲 · 马尔科夫过程与马尔科夫链 | 人工智能的数学方法</title>
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@600;700&display=swap">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://fastly.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{
+    --bg:#f5f9fc; --card:#ffffff; --ink:#1e2f3d; --sub:#51647a;
+    --primary:#2563a8; --primary-soft:#e6f0f9; --accent:#2c8a8a; --accent-soft:#e4f3f2;
+    --hl:#fff2bf; --hl-ink:#8a5a00; --line:#dbe7f0;
+    --shadow:0 6px 22px rgba(37,99,168,.10); --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:"Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.85;-webkit-text-size-adjust:100%;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 18px;}
+  header.hero{background:linear-gradient(135deg,#2563a8 0%,#2c8a8a 100%);color:#fff;padding:46px 0 38px;}
+  header.hero .kicker{font-size:15px;letter-spacing:3px;opacity:.85;margin-bottom:10px;}
+  header.hero h1{font-size:clamp(26px,4.5vw,38px);font-weight:900;letter-spacing:1px;}
+  header.hero p{margin-top:12px;font-size:clamp(15px,2.2vw,18px);opacity:.92;max-width:760px;}
+  .back-home{display:inline-flex;align-items:center;gap:8px;margin-top:20px;text-decoration:none;color:#fff;border:1px solid rgba(255,255,255,.5);padding:9px 18px;border-radius:999px;font-size:15px;}
+  .back-home:hover{background:rgba(255,255,255,.12);}
+  nav.toc{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;}
+  nav.toc .wrap{display:flex;gap:6px;padding-top:10px;padding-bottom:10px;}
+  nav.toc a{display:inline-block;color:var(--primary);text-decoration:none;font-size:15px;padding:7px 13px;border-radius:20px;flex:0 0 auto;}
+  nav.toc a:hover{background:var(--primary-soft);}
+  section{padding:38px 0 8px;}
+  h2{font-size:clamp(22px,3.2vw,28px);font-weight:900;color:var(--primary);margin-bottom:16px;padding-left:14px;border-left:5px solid var(--accent);}
+  h3{font-size:19px;font-weight:700;color:var(--ink);margin:22px 0 10px;}
+  p{margin:10px 0;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin:18px 0;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px;}
+  .hl{background:var(--hl);color:var(--hl-ink);font-weight:700;padding:1px 6px;border-radius:5px;}
+  .term{color:var(--primary);font-weight:700;}
+  .note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:16px;}
+  .formula{background:#fbfdff;border:1px dashed var(--line);border-radius:12px;padding:14px 16px;margin:14px 0;overflow-x:auto;}
+  ul,ol{padding-left:24px;margin:10px 0;}
+  li{margin:7px 0;}
+  code{background:var(--primary-soft);color:var(--primary);padding:1px 6px;border-radius:5px;font-size:15px;font-family:"SFMono-Regular",Consolas,Menlo,monospace;}
+  pre{background:#1f3346;color:#eaf3fb;border-radius:12px;padding:16px;overflow-x:auto;font-size:14.5px;line-height:1.7;margin:12px 0;font-family:"SFMono-Regular",Consolas,Menlo,monospace;}
+  pre code{background:transparent;color:inherit;padding:0;}
+  table.data{border-collapse:collapse;width:100%;margin:12px 0;font-size:15.5px;}
+  table.data th,table.data td{border:1px solid var(--line);padding:9px 12px;text-align:left;}
+  table.data th{background:var(--primary-soft);color:var(--primary);}
+  table.data td:first-child{white-space:nowrap;font-family:Consolas,Menlo,monospace;color:var(--primary);font-weight:600;}
+  .demo-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:14px;}
+  .demo-head h3{margin:0;}
+  .badge{display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:700;padding:3px 10px;border-radius:12px;}
+  button.btn{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;}
+  button.btn.secondary{background:var(--accent);}
+  button.btn.ghost{background:#fff;color:var(--primary);border:1px solid var(--primary);}
+  button.btn:active{transform:scale(.97);}
+  button.btn:disabled{opacity:.5;cursor:not-allowed;}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0;}
+  .stat{font-size:16px;color:var(--sub);}
+  .stat b{color:var(--ink);}
+  table.matrix{border-collapse:collapse;margin:10px 0;}
+  table.matrix td{padding:6px 8px;text-align:center;}
+  table.matrix input{width:74px;padding:8px;border:1px solid var(--line);border-radius:8px;font-size:16px;text-align:center;font-family:inherit;}
+  table.matrix th{font-size:14px;color:var(--sub);padding:4px;}
+  svg{max-width:100%;height:auto;display:block;margin:0 auto;}
+  canvas{max-width:100%;height:auto;display:block;margin:0 auto;}
+  .freq-row{display:flex;align-items:center;gap:10px;margin:8px 0;}
+  .freq-row .label{width:70px;font-size:15px;}
+  .freq-bar-bg{flex:1;background:#eef4f9;border-radius:8px;height:22px;overflow:hidden;}
+  .freq-bar{height:100%;border-radius:8px;transition:width .3s;}
+  .freq-row .val{width:160px;text-align:right;font-size:15px;font-variant-numeric:tabular-nums;}
+  .gen-output{min-height:70px;background:#fbfdff;border:1px solid var(--line);border-radius:12px;padding:14px;font-size:17px;line-height:1.9;}
+  details{margin:14px 0;border:1px solid var(--line);border-radius:12px;background:#fbfdff;}
+  summary{cursor:pointer;padding:12px 16px;font-weight:700;color:var(--accent);list-style:none;}
+  summary::before{content:"▸ ";}
+  details[open] summary::before{content:"▾ ";}
+  details[open] summary{border-bottom:1px solid var(--line);}
+  details .solution{padding:12px 16px;}
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .65s ease,transform .65s ease;}
+  .reveal.visible{opacity:1;transform:none;}
+  footer{padding:30px 0 50px;color:var(--sub);font-size:14px;text-align:center;}
+  @media (max-width:640px){
+    body{font-size:16px;}
+    .card{padding:16px;}
+    header.hero{padding:34px 0 28px;}
+    table.matrix input{width:60px;}
+    table.data{font-size:14px;}
+    .freq-row .val{width:130px;font-size:13px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">硕士生课程 · 人工智能的数学方法 · 第一讲</div>
+    <h1>马尔科夫过程与马尔科夫链</h1>
+    <p>从天气演变与输入法预测两个直观例子出发，建立马尔科夫性、转移矩阵、多步转移、状态分类与平稳分布的数学框架；配合可交互动态演示，理解其在语言模型、网页排名、序列建模等人工智能场景中的基础作用。</p>
+    <a class="back-home" href="人工智能数学方法.html">← 返回课程首页</a>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#sec-intro">课程导入</a>
+    <a href="#sec-symbols">符号说明</a>
+    <a href="#sec-math">数学原理</a>
+    <a href="#sec-cases">经典案例</a>
+    <a href="#sec-algo">核心算法</a>
+    <a href="#sec-demo1">演示·天气链</a>
+    <a href="#sec-demo2">演示·分布收敛</a>
+    <a href="#sec-demo3">演示·平稳分布</a>
+    <a href="#sec-demo4">演示·文本生成</a>
+    <a href="#sec-ai">AI 应用</a>
+    <a href="#sec-demo5">演示·PageRank</a>
+    <a href="#sec-demo6">例子·顾客流失</a>
+    <a href="#sec-demo7">应用·信用评级</a>
+    <a href="#sec-exercise">课堂练习</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- 1. 课程导入 -->
+<section id="sec-intro">
+  <h2 class="reveal">一、课程导入：两个先看懂的例子</h2>
+  <div class="card reveal">
+    <h3>例子 1：明天会不会下雨，只看今天</h3>
+    <p>设状态只有<span class="term">晴</span>、<span class="term">阴</span>、<span class="term">雨</span>三种。经验上，明天的天气更可能只与今天有关，而与前天、大前天关系不大。这种“下一步只依赖当前一步”的随机规律，就是马尔科夫性最朴素的现实来源。</p>
+  </div>
+  <div class="card reveal">
+    <h3>例子 2：输入法预测下一个字</h3>
+    <p>输入“人工智____”时，输入法最可能补全“能”。在最简单的二元语法（Bigram）中，下一个字的概率只由当前字决定：$P(\text{下一字}\mid\text{前文})\approx P(\text{下一字}\mid\text{当前字})$。这种“把历史压缩成当前状态”的近似，正是马尔科夫思想在人工智能中的典型体现。</p>
+    <div class="note">两个例子的共同点：系统随时间在不同<span class="hl">状态（State）</span>之间转移，且下一步状态的概率分布<strong>只由当前状态决定</strong>。满足这一性质的随机过程称为<span class="hl">马尔科夫过程（Markov Process）</span>；离散时间情形又称<span class="hl">马尔科夫链（Markov Chain）</span>。</div>
+  </div>
+</section>
+
+<!-- 2. 符号说明 -->
+<section id="sec-symbols">
+  <h2 class="reveal">二、符号说明（先读这张表）</h2>
+  <div class="card reveal">
+    <table class="data">
+      <tr><th>符号</th><th>中文含义</th><th>英文 / 说明</th></tr>
+      <tr><td>$X_n$</td><td>第 $n$ 步的随机状态（随机变量）</td><td>random variable at time $n$</td></tr>
+      <tr><td>$S$</td><td>状态空间，所有可能状态的集合</td><td>state space</td></tr>
+      <tr><td>$N$</td><td>状态的总数</td><td>number of states</td></tr>
+      <tr><td>$p_{ij}$</td><td>从状态 $i$ 一步转移到状态 $j$ 的概率</td><td>one-step transition probability</td></tr>
+      <tr><td>$P=(p_{ij})$</td><td>转移矩阵（随机矩阵）</td><td>transition matrix</td></tr>
+      <tr><td>$p_{ij}^{(n)}$</td><td>从 $i$ 经 $n$ 步转移到 $j$ 的概率</td><td>$n$-step transition probability</td></tr>
+      <tr><td>$\pi^{(n)}$</td><td>第 $n$ 步的状态分布行向量</td><td>state distribution at step $n$</td></tr>
+      <tr><td>$\pi$</td><td>平稳分布（长期状态占比）</td><td>stationary distribution</td></tr>
+      <tr><td>$\gamma$</td><td>折扣因子（后续讲次用于回报折现）</td><td>discount factor，$0\le\gamma<1$</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- 3. 数学原理 -->
+<section id="sec-math">
+  <h2 class="reveal">三、数学原理</h2>
+
+  <div class="card reveal">
+    <h3>3.1 随机过程与马尔科夫性</h3>
+    <p>设随机过程 $\{X_n,\,n=0,1,2,\dots\}$ 取值于有限状态空间 $S=\{1,2,\dots,N\}$。若对任意状态 $i_0,i_1,\dots,i_n,j$，都有</p>
+    <div class="formula">
+      $$P\bigl(X_{n+1}=j\mid X_n=i_n,X_{n-1}=i_{n-1},\dots,X_0=i_0\bigr)
+      =P\bigl(X_{n+1}=j\mid X_n=i_n\bigr)$$
+    </div>
+    <p>则称该过程具有<span class="hl">马尔科夫性（Markov Property）</span>：给定现在，未来与过去<span class="term">条件独立</span>，历史信息已全部包含在当前状态之中。</p>
+    <p style="color:var(--sub);font-size:15px;">本课程主要讨论离散时间、有限状态、时齐的情形。</p>
+  </div>
+
+  <div class="card reveal">
+    <h3>3.2 转移概率与转移矩阵</h3>
+    <p>一步转移概率定义为</p>
+    <div class="formula">$$p_{ij}=P(X_{n+1}=j\mid X_n=i),\qquad i,j\in S$$</div>
+    <p>它满足非负性与行和为 1：</p>
+    <div class="formula">$$p_{ij}\ge 0,\qquad \sum_{j\in S}p_{ij}=1$$</div>
+    <p>将所有 $p_{ij}$ 排成 $N\times N$ 矩阵，称为<span class="hl">转移矩阵 $P$</span>，又称随机矩阵：</p>
+    <div class="formula">
+      $$P=(p_{ij})=\begin{pmatrix}p_{11}&p_{12}&\cdots&p_{1N}\\p_{21}&p_{22}&\cdots&p_{2N}\\\vdots&\vdots&\ddots&\vdots\\p_{N1}&p_{N2}&\cdots&p_{NN}\end{pmatrix}$$
+    </div>
+    <p>若 $p_{ij}$ 与时间 $n$ 无关，称为<span class="term">时齐（齐次）马尔科夫链</span>。</p>
+  </div>
+
+  <div class="card reveal">
+    <h3>3.3 查普曼–柯尔莫哥洛夫方程：多步转移</h3>
+    <p>记 $n$ 步转移概率 $p_{ij}^{(n)}=P(X_{n+k}=j\mid X_k=i)$。多步转移可在中间状态 $k$ 上求和分解，即<span class="hl">C–K 方程</span>：</p>
+    <div class="formula">$$p_{ij}^{(m+n)}=\sum_{k\in S}p_{ik}^{(m)}p_{kj}^{(n)}$$</div>
+    <p>矩阵形式即为矩阵幂：$P^{(n)}=P^n$。若用行向量 $\pi^{(n)}$ 表示第 $n$ 步状态分布，则</p>
+    <div class="formula">$$\pi^{(n+1)}=\pi^{(n)}P,\qquad \pi^{(n)}=\pi^{(0)}P^n$$</div>
+  </div>
+
+  <div class="card reveal">
+    <h3>3.4 状态分类与链的性质</h3>
+    <ul>
+      <li><span class="term">可达与互通</span>：存在 $n\ge0$ 使 $p_{ij}^{(n)}>0$，称 $j$ 从 $i$ 可达；互相可达则互通。</li>
+      <li><span class="hl">不可约（Irreducible）</span>：任意两状态互通，整个状态空间构成一个类。</li>
+      <li><span class="term">常返 / 瞬态</span>：出发后无限次返回该状态的概率为 1，称常返态；否则为瞬态。</li>
+      <li><span class="term">周期 / 非周期</span>：返回所需步数的最大公约数为 1 称非周期，否则为周期链。</li>
+      <li><span class="hl">遍历链（Ergodic Chain）</span>：不可约、非周期、正常返的马尔科夫链。</li>
+      <li><span class="term">吸收态</span>：$p_{ii}=1$，一旦进入便不再离开。</li>
+    </ul>
+  </div>
+
+  <div class="card reveal">
+    <h3>3.5 平稳分布与遍历定理</h3>
+    <p>若分布 $\pi=(\pi_1,\dots,\pi_N)$ 满足</p>
+    <div class="formula">$$\pi P=\pi,\qquad \sum_{i=1}^{N}\pi_i=1,\quad \pi_i\ge0$$</div>
+    <p>则称 $\pi$ 为<span class="hl">平稳分布（Stationary Distribution）</span>：达到该分布后再转移一步分布不变，$\pi_i$ 可解释为长期处于状态 $i$ 的时间比例。</p>
+    <div class="formula">
+      <strong>遍历定理：</strong>若 $P$ 是不可约、非周期、正常返的遍历链，则存在唯一平稳分布 $\pi$，且
+      $$\lim_{n\to\infty}P^n=\mathbf{1}\,\pi^{\top},\qquad \lim_{n\to\infty}\pi^{(n)}=\pi$$
+    </div>
+    <p>即无论初始分布如何，链的长期行为都收敛到同一个平稳分布。</p>
+  </div>
+</section>
+
+<!-- 4. 经典案例 -->
+<section id="sec-cases">
+  <h2 class="reveal">四、四个经典建模案例</h2>
+  <div class="grid">
+    <div class="card reveal"><h3>案例 1：天气逐日演变</h3><p>状态 $\{\text{晴},\text{阴},\text{雨}\}$，转移矩阵描述相邻两天天气的概率关系，长期各天气占比由平稳分布决定。</p></div>
+    <div class="card reveal"><h3>案例 2：客户品牌转移</h3><p>消费者在甲、乙、丙品牌间流转，$p_{ij}$ 表示本期选 $i$、下期选 $j$ 的概率，市场份额长期预测即求平稳分布。</p></div>
+    <div class="card reveal"><h3>案例 3：赌徒破产（吸收链）</h3><p>每次赢 1 元概率 $p$、输 1 元概率 $q$，本金在 $0$ 与 $N$ 之间，两端为吸收态，可求破产概率与平均步数。</p></div>
+    <div class="card reveal"><h3>案例 4：网页浏览随机游走</h3><p>浏览者在网页间按链接随机跳转，构成图上的马尔科夫链，其平稳分布即网页重要性 PageRank 的来源。</p></div>
+  </div>
+</section>
+
+<!-- 5. 核心算法 -->
+<section id="sec-algo">
+  <h2 class="reveal">五、具体算法</h2>
+  <div class="grid">
+    <div class="card reveal">
+      <h3>算法 1：一步 / 多步预测</h3>
+      <p>已知当前分布 $\pi^{(n)}$ 与 $P$，按行向量乘法推进：</p>
+      <div class="formula">$$\pi^{(n+1)}_j=\sum_i\pi^{(n)}_i p_{ij}$$</div>
+      <p>多步预测等价于计算 $P^n$，或反复迭代上式。</p>
+    </div>
+    <div class="card reveal">
+      <h3>算法 2：平稳分布求解</h3>
+      <p>解线性方程组 $\pi(P-I)=0$，并补充归一化 $\sum_i\pi_i=1$：</p>
+      <div class="formula">$$\begin{cases}\sum_i\pi_i(p_{ij}-\delta_{ij})=0,\;j=1,\dots,N-1\\\sum_i\pi_i=1\end{cases}$$</div>
+      <p>可用高斯消元，或取特征值 1 对应的左特征向量；大规模图上常用幂迭代。</p>
+    </div>
+    <div class="card reveal">
+      <h3>算法 3：蒙特卡洛模拟</h3>
+      <ol>
+        <li>按初始分布抽取 $X_0$；</li>
+        <li>在当前状态 $i$ 下按 $(p_{i1},\dots,p_{iN})$ 轮盘赌抽样下一状态；</li>
+        <li>重复采样 $T$ 步，用状态频率逼近平稳分布。</li>
+      </ol>
+      <p>适用于状态空间巨大、无法直接求解方程组的情形。</p>
+    </div>
+    <div class="card reveal">
+      <h3>算法 4：分布演化与收敛判断</h3>
+      <p>反复执行 $\pi\leftarrow\pi P$，直至相邻两步分布之差小于阈值：</p>
+      <div class="formula">$$\|\pi^{(n+1)}-\pi^{(n)}\|_1<\varepsilon$$</div>
+      <p>此时可认为链已近似达到平稳分布。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6. 演示 1：天气链 -->
+<section id="sec-demo1">
+  <h2 class="reveal">六、交互演示 1：天气马尔科夫链模拟</h2>
+  <div class="card reveal">
+    <div class="demo-head"><span class="badge">蒙特卡洛模拟</span><h3>晴 / 阴 / 雨 三状态随机游走</h3></div>
+    <p>状态空间 $S=\{\text{晴},\text{阴},\text{雨}\}$。可直接修改下方转移矩阵（点击“行归一化”使每行概率和为 1），再开始模拟，观察状态游走与长期频率。</p>
+    <table class="matrix" id="weatherMatrix">
+      <tr><th></th><th>→ 晴</th><th>→ 阴</th><th>→ 雨</th></tr>
+      <tr><th>晴</th><td><input value="0.70" type="number" step="0.05" min="0"></td><td><input value="0.20" type="number" step="0.05" min="0"></td><td><input value="0.10" type="number" step="0.05" min="0"></td></tr>
+      <tr><th>阴</th><td><input value="0.40" type="number" step="0.05" min="0"></td><td><input value="0.40" type="number" step="0.05" min="0"></td><td><input value="0.20" type="number" step="0.05" min="0"></td></tr>
+      <tr><th>雨</th><td><input value="0.20" type="number" step="0.05" min="0"></td><td><input value="0.30" type="number" step="0.05" min="0"></td><td><input value="0.50" type="number" step="0.05" min="0"></td></tr>
+    </table>
+    <div class="controls">
+      <button class="btn" id="wStart">开始模拟</button>
+      <button class="btn ghost" id="wStep">单步走一步</button>
+      <button class="btn secondary" id="wReset">重置</button>
+      <span class="stat">步数：<b id="wStepCount">0</b></span>
+      <span class="stat">当前：<b id="wCur">晴</b></span>
+    </div>
+    <svg viewBox="0 0 300 250" id="weatherSvg" aria-label="天气状态转移图"></svg>
+    <div style="margin-top:14px;">
+      <div class="freq-row"><span class="label">晴</span><div class="freq-bar-bg"><div class="freq-bar" id="bar0" style="background:#4a90d9;width:0%"></div></div><span class="val" id="val0">0.000</span></div>
+      <div class="freq-row"><span class="label">阴</span><div class="freq-bar-bg"><div class="freq-bar" id="bar1" style="background:#9aa5b1;width:0%"></div></div><span class="val" id="val1">0.000</span></div>
+      <div class="freq-row"><span class="label">雨</span><div class="freq-bar-bg"><div class="freq-bar" id="bar2" style="background:#6b7fd7;width:0%"></div></div><span class="val" id="val2">0.000</span></div>
+    </div>
+    <div class="note">步数足够多时，三个状态频率趋于稳定，逼近该转移矩阵的平稳分布（见演示 3）。</div>
+  </div>
+</section>
+
+<!-- 7. 演示 2：分布演化 -->
+<section id="sec-demo2">
+  <h2 class="reveal">七、交互演示 2：状态分布的演化与收敛</h2>
+  <div class="card reveal">
+    <div class="demo-head"><span class="badge">$\pi^{(n)}=\pi^{(0)}P^n$</span><h3>分布随步数收敛到平稳分布</h3></div>
+    <p>初始分布为“第 0 天一定是晴天”，即 $\pi^{(0)}=(1,0,0)$。下图展示三条分布曲线随步数 $n$ 的演化，水平虚线为数值求解的平稳分布。</p>
+    <div class="controls">
+      <button class="btn" id="dPlay">▶ 播放演化</button>
+      <button class="btn ghost" id="dStep">单步</button>
+      <button class="btn secondary" id="dReset">重置</button>
+      <span class="stat">当前步数：<b id="dN">0</b></span>
+    </div>
+    <canvas id="distCanvas" width="720" height="360"></canvas>
+    <div class="note">曲线趋于水平，正是遍历链 $\lim_{n\to\infty}\pi^{(n)}=\pi$ 的直观体现；转移矩阵改变后，收敛速度与极限值也随之改变。</div>
+  </div>
+</section>
+
+<!-- 8. 演示 3：平稳分布求解器 -->
+<section id="sec-demo3">
+  <h2 class="reveal">八、交互演示 3：平稳分布求解器</h2>
+  <div class="card reveal">
+    <div class="demo-head"><span class="badge">解 $\pi P=\pi$</span><h3>输入任意 3×3 随机矩阵，求平稳分布</h3></div>
+    <p>修改转移矩阵后点击“求解平稳分布”，程序通过高斯消元解 $\pi(P-I)=0$ 并归一化，同时校验残差 $\|\pi P-\pi\|_1$（越接近 0 解得越准）。</p>
+    <table class="matrix" id="stationMatrix">
+      <tr><th></th><th>→ 状态 1</th><th>→ 状态 2</th><th>→ 状态 3</th></tr>
+      <tr><th>状态 1</th><td><input value="0.70" type="number" step="0.05" min="0"></td><td><input value="0.20" type="number" step="0.05" min="0"></td><td><input value="0.10" type="number" step="0.05" min="0"></td></tr>
+      <tr><th>状态 2</th><td><input value="0.40" type="number" step="0.05" min="0"></td><td><input value="0.40" type="number" step="0.05" min="0"></td><td><input value="0.20" type="number" step="0.05" min="0"></td></tr>
+      <tr><th>状态 3</th><td><input value="0.20" type="number" step="0.05" min="0"></td><td><input value="0.30" type="number" step="0.05" min="0"></td><td><input value="0.50" type="number" step="0.05" min="0"></td></tr>
+    </table>
+    <div class="controls">
+      <button class="btn" id="solveBtn">求解平稳分布</button>
+      <button class="btn ghost" id="normBtn">行归一化</button>
+    </div>
+    <div id="solveResult" class="note" style="display:none;"></div>
+  </div>
+</section>
+
+<!-- 9. 演示 4：文本生成 -->
+<section id="sec-demo4">
+  <h2 class="reveal">九、交互演示 4：马尔科夫文本生成器</h2>
+  <div class="card reveal">
+    <div class="demo-head"><span class="badge">一阶马尔科夫 · Bigram</span><h3>基于字符转移概率逐字生成</h3></div>
+    <p>程序从内嵌语料统计字符级 bigram 转移频率 $P(c_t\mid c_{t-1})$，再按轮盘赌抽样逐字生成。反复点击“生成下一个字”，观察马尔科夫假设如何产生局部连贯、但缺乏长程规划的片段。</p>
+    <div class="controls">
+      <button class="btn" id="genChar">生成下一个字</button>
+      <button class="btn secondary" id="genAuto">自动生成 40 字</button>
+      <button class="btn ghost" id="genClear">清空</button>
+    </div>
+    <div class="gen-output" id="genOutput">点击按钮开始生成……</div>
+    <div class="note">n-gram 模型只看前一个字；大语言模型通过注意力机制扩展到更长上下文，但马尔科夫思想仍是其概率建模的源头之一。</div>
+  </div>
+</section>
+
+<!-- 10. AI 应用 -->
+<section id="sec-ai">
+  <h2 class="reveal">十、马尔科夫过程在人工智能中的应用</h2>
+  <div class="grid">
+    <div class="card reveal">
+      <h3>10.1 $n$ 元语言模型</h3>
+      <p>$n$-gram 模型把条件概率做马尔科夫近似：</p>
+      <div class="formula">$$P(w_t\mid w_{t-1},\dots,w_1)\approx P(w_t\mid w_{t-1})$$</div>
+      <p>即使是大语言模型，其局部上下文窗口的预测也可视为高阶马尔科夫假设的工程化实现。</p>
+    </div>
+    <div class="card reveal">
+      <h3>10.2 PageRank 与随机游走</h3>
+      <p>网页链接结构建模为图上的马尔科夫链，浏览者按转移概率随机跳转，长期平稳分布即为各网页 PageRank：</p>
+      <div class="formula">$$PR(p_i)=\sum_{p_j\to p_i}\frac{PR(p_j)}{L(p_j)}$$</div>
+    </div>
+    <div class="card reveal">
+      <h3>10.3 序列建模与状态估计（预告）</h3>
+      <p>当真实状态不可直接观测、只能看到带噪观测时，得到<span class="hl">隐马尔可夫模型（HMM）</span>；在其基础上引入受控动作即推广到<span class="hl">部分可观测决策（POMDP）</span>。这两条线索将在第四讲展开。</p>
+    </div>
+    <div class="card reveal">
+      <h3>10.4 其他人工智能场景</h3>
+      <ul>
+        <li><span class="term">推荐系统</span>：把用户近期行为看作状态，建模兴趣在状态间的转移。</li>
+        <li><span class="term">金融时间序列</span>：股价涨跌、波动率状态常用隐马尔可夫模型刻画。</li>
+        <li><span class="term">生物信息学</span>：基因序列、蛋白质结构预测中的序列建模。</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 11. 演示 5：PageRank -->
+<section id="sec-demo5">
+  <h2 class="reveal">十一、交互演示 5：PageRank · 网页随机游走</h2>
+  <div class="card reveal">
+    <div class="demo-head"><span class="badge">马尔科夫链 · 平稳分布即排名</span><h3>4 个网页间随机跳转，访问占比收敛到 PageRank</h3></div>
+    <p>四个网页 $A,B,C,D$ 的链接关系见下图（箭头表示可跳转）。到达某网页后，在其出链中等概率选择下一站。点击“游走一步”观察光点移动；条形图为实际访问占比，“理论”一列是平稳分布（即 PageRank）。</p>
+    <div class="controls">
+      <button class="btn" id="prStep">游走一步</button>
+      <button class="btn secondary" id="prAuto">自动游走</button>
+      <button class="btn ghost" id="prReset">重置</button>
+      <span class="stat">步数：<b id="prN">0</b></span>
+    </div>
+    <svg viewBox="0 0 320 250" id="prSvg" aria-label="网页链接图"></svg>
+    <div style="margin-top:14px;">
+      <div class="freq-row"><span class="label">A</span><div class="freq-bar-bg"><div class="freq-bar" id="prBar0" style="background:#4a90d9;width:0%"></div></div><span class="val" id="prVal0">0.000</span></div>
+      <div class="freq-row"><span class="label">B</span><div class="freq-bar-bg"><div class="freq-bar" id="prBar1" style="background:#2c8a8a;width:0%"></div></div><span class="val" id="prVal1">0.000</span></div>
+      <div class="freq-row"><span class="label">C</span><div class="freq-bar-bg"><div class="freq-bar" id="prBar2" style="background:#6b7fd7;width:0%"></div></div><span class="val" id="prVal2">0.000</span></div>
+      <div class="freq-row"><span class="label">D</span><div class="freq-bar-bg"><div class="freq-bar" id="prBar3" style="background:#d99a4a;width:0%"></div></div><span class="val" id="prVal3">0.000</span></div>
+    </div>
+    <div class="note">长期访问占比逼近理论 PageRank——这正是“求马尔科夫链平稳分布”在搜索引擎中的经典应用。</div>
+  </div>
+</section>
+
+<!-- 12. 演示 6：概念例子 · 顾客流失 -->
+<section id="sec-demo6">
+  <h2 class="reveal">十二、易理解的交互例子：咖啡店顾客在两品牌间流转</h2>
+  <div class="card reveal">
+    <div class="demo-head"><span class="badge">生活例子 · 两状态链</span><h3>常客下次会留在本店还是转到隔壁？</h3></div>
+    <p>把顾客简化为两个状态：<span class="term">甲店</span>、<span class="term">乙店</span>。一位顾客每次消费后，按下面的概率决定下次去哪一家；本轮盘赌抽样只看“当前在哪家”，不看更早去过哪——这就是最简单的马尔科夫链。</p>
+    <table class="matrix">
+      <tr><th>本轮 \ 下次</th><th>→ 甲店</th><th>→ 乙店</th></tr>
+      <tr><th>甲店</th><td>0.8</td><td>0.2</td></tr>
+      <tr><th>乙店</th><td>0.3</td><td>0.7</td></tr>
+    </table>
+    <div class="controls">
+      <button class="btn" id="cfStep">消费一次（走一步）</button>
+      <button class="btn secondary" id="cfAuto">自动连续流转</button>
+      <button class="btn ghost" id="cfReset">重置</button>
+      <span class="stat">已消费：<b id="cfN">0</b> 次</span>
+      <span class="stat">当前：<b id="cfCur">甲店</b></span>
+    </div>
+    <div class="freq-row"><span class="label">甲店</span><div class="freq-bar-bg"><div class="freq-bar" id="cfBar0" style="background:#4a90d9;width:0%"></div></div><span class="val" id="cfVal0">0.000</span></div>
+    <div class="freq-row"><span class="label">乙店</span><div class="freq-bar-bg"><div class="freq-bar" id="cfBar1" style="background:#2c8a8a;width:0%"></div></div><span class="val" id="cfVal1">0.000</span></div>
+    <div class="note">长期看，顾客落在两家店的比例会稳定到平稳分布（甲店 $\frac{0.3}{0.5}=0.6$，乙店 $0.4$）。流转次数越多，条形比例越接近这个长期份额。</div>
+  </div>
+</section>
+
+<!-- 13. 演示 7：应用案例 · 信用评级转移 -->
+<section id="sec-demo7">
+  <h2 class="reveal">十三、可交互的应用案例：债券信用评级的年度转移</h2>
+  <div class="card reveal">
+    <div class="demo-head"><span class="badge">金融应用 · 吸收态</span><h3>一批债券评级逐年迁移，违约比例如何上升</h3></div>
+    <p>把债券信用等级看作状态：<span class="term">AAA</span>、<span class="term">A</span>、<span class="term">B</span>、<span class="term">D（违约）</span>。每年按评级转移矩阵迁移一次，<span class="hl">违约 D 是吸收态</span>（一旦违约不再迁出）。初始组合中 AAA 占 40%、A 占 40%、B 占 20%。点击按钮逐年推进，观察各等级份额与累计违约比例。</p>
+    <table class="matrix" id="ratingMatrix">
+      <tr><th>本年 \ 次年</th><th>AAA</th><th>A</th><th>B</th><th>D</th></tr>
+      <tr><th>AAA</th><td>0.90</td><td>0.08</td><td>0.02</td><td>0.00</td></tr>
+      <tr><th>A</th><td>0.05</td><td>0.85</td><td>0.09</td><td>0.01</td></tr>
+      <tr><th>B</th><td>0.00</td><td>0.10</td><td>0.82</td><td>0.08</td></tr>
+      <tr><th>D</th><td>0.00</td><td>0.00</td><td>0.00</td><td>1.00</td></tr>
+    </table>
+    <div class="controls">
+      <button class="btn" id="rtStep">推进 1 年</button>
+      <button class="btn secondary" id="rtTen">推进 10 年</button>
+      <button class="btn ghost" id="rtReset">重置</button>
+      <span class="stat">已过：<b id="rtN">0</b> 年</span>
+      <span class="stat">违约比例：<b id="rtDef">0.000</b></span>
+    </div>
+    <div class="freq-row"><span class="label">AAA</span><div class="freq-bar-bg"><div class="freq-bar" id="rtBar0" style="background:#4a90d9;width:40%"></div></div><span class="val" id="rtVal0">0.400</span></div>
+    <div class="freq-row"><span class="label">A</span><div class="freq-bar-bg"><div class="freq-bar" id="rtBar1" style="background:#2c8a8a;width:40%"></div></div><span class="val" id="rtVal1">0.400</span></div>
+    <div class="freq-row"><span class="label">B</span><div class="freq-bar-bg"><div class="freq-bar" id="rtBar2" style="background:#d99a4a;width:20%"></div></div><span class="val" id="rtVal2">0.200</span></div>
+    <div class="freq-row"><span class="label">D 违约</span><div class="freq-bar-bg"><div class="freq-bar" id="rtBar3" style="background:#c0392b;width:0%"></div></div><span class="val" id="rtVal3">0.000</span></div>
+    <div class="note">这是一个含吸收态的可约链：长期所有债券最终都会被 D 吸收，只是时间长短不同。信用风险模型正是用这类转移矩阵估计不同期限的累计违约概率。</div>
+  </div>
+</section>
+
+<!-- 14. 课堂练习 -->
+<section id="sec-exercise">
+  <h2 class="reveal">十二、课堂练习（含详解）</h2>
+  <div class="card reveal">
+    <p>练习 1–4 可用 Python + NumPy 在 20–40 分钟内完成；练习 5–7 为课堂手算题。每道题都附有可折叠的详细解答过程。</p>
+
+    <h3>练习 1：天气链蒙特卡洛模拟（基础 · 编程）</h3>
+    <p>给定转移矩阵 $P$，模拟 $T=10000$ 天的天气序列，统计各状态频率，并与解析平稳分布对比。</p>
+<pre><code>import numpy as np
+
+P = np.array([[0.7, 0.2, 0.1],
+              [0.4, 0.4, 0.2],
+              [0.2, 0.3, 0.5]])
+states = [0, 1, 2]
+cur = 0
+counts = np.zeros(3)
+T = 10000
+for _ in range(T):
+    cur = np.random.choice(states, p=P[cur])
+    counts[cur] += 1
+print("模拟频率：", counts / T)</code></pre>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p>由演示 3 可求得平稳分布 $\pi\approx(0.5106,\,0.2766,\,0.2128)$。根据遍历定理与大数定律，$T$ 足够大时模拟频率逼近 $\pi$：晴约 51.1%、阴约 27.7%、雨约 21.3%。样本量较小时波动明显，$T$ 越大偏差越小。</p>
+    </div></details>
+
+    <h3>练习 2：数值求解平稳分布（基础 · 编程）</h3>
+    <p>解线性方程组 $\pi(P-I)=0$ 并归一化；也可用幂迭代 $\pi\leftarrow\pi P$ 逼近。</p>
+<pre><code>N = P.shape[0]
+A = (P - np.eye(N)).T
+A[-1, :] = 1
+b = np.zeros(N); b[-1] = 1
+pi = np.linalg.solve(A, b)
+print("平稳分布：", pi)
+print("校验 πP−π：", np.max(np.abs(pi @ P - pi)))</code></pre>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p>对练习 1 的 $P$，前两行来自 $\pi(P-I)=0$，第三行替换为归一化条件。解得 $\pi=(0.5106,\;0.2766,\;0.2128)$，校验 $\|\pi P-\pi\|_1\approx0$（机器精度内）。若矩阵可约或周期，解可能不唯一或奇异。</p>
+    </div></details>
+
+    <h3>练习 3：两状态链的收敛速度（进阶 · 推导 + 编程）</h3>
+    <p>取 $P=\begin{pmatrix}1-a & a\\ b & 1-b\end{pmatrix}$，解析求平稳分布 $\pi$；再数值迭代 $\pi^{(n)}=\pi^{(0)}P^n$，画出收敛曲线，分析 $a,b$ 对收敛速度的影响。</p>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p>由 $\pi P=\pi$ 与归一化：$\pi_1 a=\pi_2 b$，故 $\pi=\left(\frac{b}{a+b},\;\frac{a}{a+b}\right)$。该链次特征值为 $1-a-b$，其绝对值决定收敛速度：$a+b$ 越大特征值越接近 0，收敛越快；$a+b$ 越小收敛越慢。</p>
+    </div></details>
+
+    <h3>练习 4：字符级 bigram 文本生成（进阶 · 编程）</h3>
+    <p>从一段中文语料统计字间转移频率，构造转移字典；给定起始字，按频率轮盘赌抽样生成 50 字，观察连贯性与局限。</p>
+<pre><code>from collections import defaultdict
+import random
+
+corpus = "马尔可夫过程是研究随机状态演化的数学模型。强化学习以马尔可夫决策过程为基础。"
+trans = defaultdict(lambda: defaultdict(int))
+for x, y in zip(corpus, corpus[1:]):
+    trans[x][y] += 1
+
+def next_char(ch):
+    items = list(trans[ch].items())
+    if not items: return random.choice(corpus)
+    words, weights = zip(*items)
+    return random.choices(words, weights=weights)[0]
+
+out = "马"
+for _ in range(50):
+    out += next_char(out[-1])
+print(out)</code></pre>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p>生成结果通常在局部词语上通顺（如“马尔可夫”“状态”），但可能重复拼接或语义断裂，因为模型只看前一个字、没有长程上下文规划。升级为 trigram（看前两字）连贯性会改善，但数据稀疏问题也会加剧。</p>
+    </div></details>
+
+    <h3>练习 5：课堂手算 · 两步转移与分布演化（手算题）</h3>
+    <p>给定两状态链 $P=\begin{pmatrix}0.6 & 0.4\\ 0.2 & 0.8\end{pmatrix}$，初始分布 $\pi^{(0)}=(0.5,\,0.5)$。要求：(1) 手算 $\pi^{(1)},\pi^{(2)}$；(2) 手算 $P^2$；(3) 求平稳分布 $\pi$，并比较 $\pi^{(2)}$ 与 $\pi^{(1)}$ 谁更靠近 $\pi$。</p>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p><strong>(1)</strong> $\pi^{(1)}=\pi^{(0)}P=(0.40,\;0.60)$；$\pi^{(2)}=\pi^{(1)}P=(0.36,\;0.64)$。</p>
+      <p><strong>(2)</strong> $P^2=\begin{pmatrix}0.44 & 0.56\\ 0.28 & 0.72\end{pmatrix}$，可用 $\pi^{(2)}=\pi^{(0)}P^2$ 验算。</p>
+      <p><strong>(3)</strong> 由练习 3 公式（$a=0.4,b=0.2$）：$\pi=(1/3,\;2/3)\approx(0.333,\;0.667)$。$\|\pi^{(1)}-\pi\|_1\approx0.133$，$\|\pi^{(2)}-\pi\|_1\approx0.053$，故 $\pi^{(2)}$ 更靠近平稳分布，链在向 $\pi$ 收敛。</p>
+    </div></details>
+
+    <h3>练习 6：手算 C–K 方程与两步转移（手算题）</h3>
+    <p>给定两状态链 $P=\begin{pmatrix}0.5 & 0.5\\ 0.3 & 0.7\end{pmatrix}$，初始分布 $\pi^{(0)}=(1,\,0)$。要求：(1) 用 C–K 方程手算 $P^2$；(2) 手算 $\pi^{(1)}$ 与 $\pi^{(2)}$，并用 $\pi^{(2)}=\pi^{(0)}P^2$ 验算；(3) 求平稳分布 $\pi$。</p>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p><strong>(1) 计算 $P^2$（C–K 方程 $p_{ij}^{(2)}=\sum_k p_{ik}p_{kj}$）：</strong></p>
+      <p>第一行：$p_{11}^{(2)}=0.5\times0.5+0.5\times0.3=0.40$；$p_{12}^{(2)}=0.5\times0.5+0.5\times0.7=0.60$。</p>
+      <p>第二行：$p_{21}^{(2)}=0.3\times0.5+0.7\times0.3=0.36$；$p_{22}^{(2)}=0.3\times0.5+0.7\times0.7=0.64$。</p>
+      <p>故 $P^2=\begin{pmatrix}0.40 & 0.60\\ 0.36 & 0.64\end{pmatrix}$。</p>
+      <p><strong>(2) 分布演化：</strong>$\pi^{(1)}=\pi^{(0)}P=(0.5,\;0.5)$；$\pi^{(2)}=\pi^{(1)}P=(0.40,\;0.60)$。验算：$\pi^{(0)}P^2$ 取 $P^2$ 第一行，即 $(0.40,\;0.60)$，一致。</p>
+      <p><strong>(3) 平稳分布：</strong>令 $P=\begin{pmatrix}1-a & a\\ b & 1-b\end{pmatrix}$，其中 $a=0.5,\ b=0.3$，则 $\pi=\left(\frac{b}{a+b},\;\frac{a}{a+b}\right)=\left(\frac{3}{8},\;\frac{5}{8}\right)\approx(0.375,\;0.625)$。</p>
+    </div></details>
+
+    <h3>练习 7：吸收态与链的可约性判断（手算 + 概念）</h3>
+    <p>给定三状态转移矩阵 $P=\begin{pmatrix}1.0 & 0.0 & 0.0\\ 0.2 & 0.6 & 0.2\\ 0.0 & 0.3 & 0.7\end{pmatrix}$。要求：(1) 指出哪个状态是吸收态；(2) 判断状态 2、3 是否互通，整条链是否可约；(3) 定性说明从状态 2 出发，长期停留状态 1、2、3 的概率趋势。</p>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p><strong>(1) 吸收态：</strong>状态 1 满足 $p_{11}=1$、$p_{12}=p_{13}=0$，一旦进入状态 1 便不再离开，故状态 1 是<span class="term">吸收态</span>。</p>
+      <p><strong>(2) 互通与可约性：</strong>状态 2 到 3 有 $p_{23}=0.2>0$，状态 3 到 2 有 $p_{32}=0.3>0$，故 2、3 互通；但从 2、3 可到 1，从 1 无法回到 2、3，状态空间被分成两个闭类：$\{1\}$ 与 $\{2,3\}$ 的瞬态部分，整条链<span class="hl">可约（不可约不成立）</span>。</p>
+      <p><strong>(3) 长期趋势：</strong>2、3 之间反复流转的同时，每一步都有概率滑向吸收态 1；因此长时间后，从状态 2 出发最终被状态 1 吸收的概率趋于 1，长期停留在 2、3 的概率趋于 0。这类链不存在把质量分散到 2、3 的唯一平稳分布，其平稳分布把全部质量放在吸收态 1 上。</p>
+    </div></details>
+
+    <div class="note">思考题：为什么周期性链或可约链可能不存在唯一平稳分布？请分别构造一个周期链和一个含两个闭类的可约链，用练习 2 的程序验证解是否唯一。</div>
+  </div>
+</section>
+
+</main>
+
+<footer><div class="wrap">硕士生课程《人工智能的数学方法》· 第一讲 马尔科夫过程与马尔科夫链 · 公式由 MathJax 渲染</div></footer>
+
+<script>
+const $ = id => document.getElementById(id);
+function readMatrix(tableId){
+  const rows=[...$(tableId).querySelectorAll('tr')].slice(1);
+  return rows.map(tr=>[...tr.querySelectorAll('input')].map(inp=>{
+    let v=parseFloat(inp.value); return isNaN(v)||v<0?0:v;
+  }));
+}
+function normalizeRows(P){
+  return P.map(row=>{const s=row.reduce((a,b)=>a+b,0);return s>0?row.map(x=>x/s):row.map(()=>1/row.length);});
+}
+function solveLinear(A,b){
+  const n=A.length; const M=A.map((row,i)=>[...row,b[i]]);
+  for(let col=0;col<n;col++){
+    let piv=col;
+    for(let r=col+1;r<n;r++) if(Math.abs(M[r][col])>Math.abs(M[piv][col])) piv=r;
+    [M[col],M[piv]]=[M[piv],M[col]];
+    const pv=M[col][col]; if(Math.abs(pv)<1e-12) return null;
+    for(let c=col;c<=n;c++) M[col][c]/=pv;
+    for(let r=0;r<n;r++){ if(r===col) continue; const f=M[r][col]; for(let c=col;c<=n;c++) M[r][c]-=f*M[col][c]; }
+  }
+  return M.map(row=>row[n]);
+}
+function buildStationarySystem(P){
+  const N=P.length; const A=[];
+  for(let j=0;j<N;j++){const row=[];for(let i=0;i<N;i++)row.push(P[i][j]-(i===j?1:0));A.push(row);}
+  A[N-1]=Array(N).fill(1); const b=new Array(N).fill(0); b[N-1]=1;
+  return {A,b};
+}
+function stationaryOf(P){const{A,b}=buildStationarySystem(P);return solveLinear(A,b);}
+
+/* 滚动渐显 */
+const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* 演示 1：天气链 */
+const W={states:['晴','阴','雨'],cur:0,step:0,counts:[0,0,0],timer:null};
+const nodePos=[{x:150,y:55},{x:60,y:190},{x:240,y:190}];
+const nodeColor=['#4a90d9','#9aa5b1','#6b7fd7'];
+function drawWeatherSvg(highlight){
+  const svg=$('weatherSvg');
+  let html='<defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#c4d6e4"/></marker></defs>';
+  for(let i=0;i<3;i++)for(let j=0;j<3;j++){ if(i===j)continue; const a=nodePos[i],b=nodePos[j];
+    html+=`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#c4d6e4" stroke-width="2" marker-end="url(#arr)"/>`; }
+  for(let i=0;i<3;i++){const p=nodePos[i];
+    html+=`<circle cx="${p.x}" cy="${p.y}" r="34" fill="${nodeColor[i]}" opacity="${highlight===i?1:.35}"/>`;
+    html+=`<text x="${p.x}" y="${p.y+5}" text-anchor="middle" fill="#fff" font-size="16" font-weight="700">${W.states[i]}</text>`;}
+  svg.innerHTML=html;
+}
+function weatherStep(){
+  const P=normalizeRows(readMatrix('weatherMatrix'));
+  const r=Math.random(); let acc=0,next=0;
+  for(let j=0;j<3;j++){acc+=P[W.cur][j];if(r<=acc){next=j;break;}}
+  W.cur=next; W.step++; W.counts[next]++; renderWeather();
+}
+function renderWeather(){
+  drawWeatherSvg(W.cur);
+  $('wStepCount').textContent=W.step; $('wCur').textContent=W.states[W.cur];
+  const total=W.step||1;
+  for(let i=0;i<3;i++){const f=W.counts[i]/total;$(`bar${i}`).style.width=(f*100).toFixed(1)+'%';$(`val${i}`).textContent=f.toFixed(3);}
+}
+$('wStart').onclick=()=>{if(W.timer){clearInterval(W.timer);W.timer=null;$('wStart').textContent='开始模拟';return;}
+  $('wStart').textContent='暂停';W.timer=setInterval(weatherStep,500);};
+$('wStep').onclick=weatherStep;
+$('wReset').onclick=()=>{clearInterval(W.timer);W.timer=null;$('wStart').textContent='开始模拟';W.cur=0;W.step=0;W.counts=[0,0,0];renderWeather();};
+renderWeather();
+
+/* 演示 2：分布演化 */
+const D={pi:[1,0,0],n:0,timer:null};
+function distStep(){const P=normalizeRows(readMatrix('weatherMatrix'));
+  D.pi=D.pi.map((_,j)=>D.pi.reduce((s,pi,i)=>s+pi*P[i][j],0));D.n++;drawDist();}
+function drawDist(){
+  const canvas=$('distCanvas'),ctx=canvas.getContext('2d');const Wc=canvas.width,Hc=canvas.height;
+  ctx.clearRect(0,0,Wc,Hc);
+  const P=normalizeRows(readMatrix('weatherMatrix'));const stationary=stationaryOf(P);
+  const padL=50,padR=20,padT=20,padB=40,maxN=25;
+  const X=n=>padL+(Wc-padL-padR)*n/maxN; const Y=v=>padT+(Hc-padT-padB)*(1-v);
+  ctx.strokeStyle='#9db4c8';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(padL,padT);ctx.lineTo(padL,Hc-padB);ctx.lineTo(Wc-padR,Hc-padB);ctx.stroke();
+  ctx.fillStyle='#51647a';ctx.font='14px sans-serif';
+  for(let v=0;v<=1;v+=0.25){ctx.beginPath();ctx.moveTo(padL,Y(v));ctx.lineTo(Wc-padR,Y(v));ctx.strokeStyle='#e6eef5';ctx.stroke();ctx.fillText(v.toFixed(2),12,Y(v)+5);}
+  for(let n=0;n<=maxN;n+=5)ctx.fillText(n,X(n)-6,Hc-padB+22);
+  ctx.fillText('步数 n',Wc/2-20,Hc-8);
+  if(stationary){for(let i=0;i<3;i++){ctx.setLineDash([5,5]);ctx.strokeStyle=nodeColor[i];ctx.globalAlpha=.5;
+    ctx.beginPath();ctx.moveTo(padL,Y(stationary[i]));ctx.lineTo(Wc-padR,Y(stationary[i]));ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;}}
+  let pi=[1,0,0];const traces=[pi.slice()];
+  for(let k=0;k<D.n;k++){pi=pi.map((_,j)=>pi.reduce((s,x,i)=>s+x*P[i][j],0));traces.push(pi.slice());}
+  for(let i=0;i<3;i++){ctx.strokeStyle=nodeColor[i];ctx.lineWidth=2.5;ctx.beginPath();
+    traces.forEach((t,k)=>{k===0?ctx.moveTo(X(k),Y(t[i])):ctx.lineTo(X(k),Y(t[i]));});ctx.stroke();}
+  ctx.font='15px sans-serif';
+  ['晴','阴','雨'].forEach((s,i)=>{ctx.fillStyle=nodeColor[i];ctx.fillRect(Wc-110,padT+i*24,14,14);ctx.fillStyle='#1e2f3d';ctx.fillText(s,Wc-88,padT+i*24+12);});
+  $('dN').textContent=D.n;
+}
+$('dPlay').onclick=()=>{if(D.timer){clearInterval(D.timer);D.timer=null;$('dPlay').textContent='▶ 播放演化';return;}
+  $('dPlay').textContent='暂停';D.timer=setInterval(()=>{if(D.n>=25){clearInterval(D.timer);D.timer=null;$('dPlay').textContent='▶ 播放演化';return;}distStep();},300);};
+$('dStep').onclick=distStep;
+$('dReset').onclick=()=>{clearInterval(D.timer);D.timer=null;$('dPlay').textContent='▶ 播放演化';D.pi=[1,0,0];D.n=0;drawDist();};
+drawDist();
+
+/* 演示 3：平稳分布求解 */
+$('normBtn').onclick=()=>{const P=normalizeRows(readMatrix('stationMatrix'));
+  const inputs=$('stationMatrix').querySelectorAll('input');
+  P.forEach((row,i)=>row.forEach((v,j)=>inputs[i*3+j].value=v.toFixed(3)));};
+$('solveBtn').onclick=()=>{
+  const P=normalizeRows(readMatrix('stationMatrix'));const{A,b}=buildStationarySystem(P);const pi=solveLinear(A,b);
+  const box=$('solveResult');
+  if(!pi){box.style.display='block';box.textContent='求解失败：该矩阵可能存在可约类或奇异情形，平稳分布不唯一。';return;}
+  const resid=Math.max(...pi.map((_,j)=>Math.abs(pi.reduce((s,x,i)=>s+x*P[i][j],0)-pi[j])));
+  box.style.display='block';
+  box.innerHTML='平稳分布 $\\pi=('+pi.map(x=>x.toFixed(4)).join(', ')+')$　｜　校验残差 $\\|\\pi P-\\pi\\|_1='+resid.toExponential(2)+'$';
+  if(window.MathJax)MathJax.typeset([box]);
+};
+
+/* 演示 4：bigram 文本生成 */
+const CORPUS="马尔可夫过程是研究随机状态演化的数学模型。人工智能中的强化学习常以马尔可夫决策过程为基础。隐马尔可夫模型用于语音识别与序列标注。大语言模型在局部上下文上也隐含马尔可夫假设。平稳分布描述系统长期的状态占比。";
+const transMap={};
+(function(){for(let i=0;i<CORPUS.length-1;i++){const a=CORPUS[i],b=CORPUS[i+1];
+  if(/[，。、；：！？\s]/.test(b))continue;(transMap[a]=transMap[a]||[]).push(b);}})();
+let genText='';
+function pickNext(ch){const arr=transMap[ch];if(!arr||!arr.length)return CORPUS[Math.floor(Math.random()*CORPUS.length)];return arr[Math.floor(Math.random()*arr.length)];}
+function genOne(){if(!genText)genText='马';else genText+=pickNext(genText[genText.length-1]);$('genOutput').textContent=genText;}
+$('genChar').onclick=genOne;
+$('genAuto').onclick=()=>{for(let k=0;k<40;k++)genOne();};
+$('genClear').onclick=()=>{genText='';$('genOutput').textContent='点击按钮开始生成……';};
+
+/* 演示 5：PageRank */
+const PR={names:['A','B','C','D'],edges:[[1,2],[2,3],[0],[0,1]],cur:0,step:0,counts:[0,0,0,0],timer:null,theory:null,P:null};
+(function(){const N=4;PR.P=Array.from({length:N},(_,i)=>{const row=new Array(N).fill(0);const outs=PR.edges[i];outs.forEach(j=>row[j]=1/outs.length);return row;});PR.theory=stationaryOf(PR.P);})();
+const prPos=[{x:70,y:195},{x:250,y:195},{x:160,y:60},{x:70,y:60}];
+const prColor=['#4a90d9','#2c8a8a','#6b7fd7','#d99a4a'];
+function prDrawSvg(){
+  const svg=$('prSvg');
+  let html='<defs><marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#c4d6e4"/></marker></defs>';
+  PR.edges.forEach((outs,i)=>outs.forEach(j=>{const a=prPos[i],b=prPos[j];
+    html+=`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#c4d6e4" stroke-width="2" marker-end="url(#arr2)"/>`;}));
+  for(let i=0;i<4;i++){const p=prPos[i];
+    html+=`<circle cx="${p.x}" cy="${p.y}" r="28" fill="${prColor[i]}" opacity="${PR.cur===i?1:.4}"/>`;
+    html+=`<text x="${p.x}" y="${p.y+6}" text-anchor="middle" fill="#fff" font-size="17" font-weight="700">${PR.names[i]}</text>`;}
+  const p=prPos[PR.cur];html+=`<circle cx="${p.x}" cy="${p.y}" r="8" fill="#fff" stroke="#1e2f3d" stroke-width="2"/>`;
+  svg.innerHTML=html;
+}
+function prStep(){const outs=PR.edges[PR.cur];PR.cur=outs[Math.floor(Math.random()*outs.length)];PR.step++;PR.counts[PR.cur]++;prRender();}
+function prRender(){prDrawSvg();$('prN').textContent=PR.step;const total=PR.step||1;
+  for(let i=0;i<4;i++){const f=PR.counts[i]/total;$(`prBar${i}`).style.width=(f*100).toFixed(1)+'%';
+    $(`prVal${i}`).textContent=f.toFixed(3)+' / 理论 '+(PR.theory?PR.theory[i].toFixed(3):'—');}}
+$('prStep').onclick=prStep;
+$('prAuto').onclick=()=>{if(PR.timer){clearInterval(PR.timer);PR.timer=null;$('prAuto').textContent='自动游走';return;}
+  $('prAuto').textContent='暂停';PR.timer=setInterval(prStep,400);};
+$('prReset').onclick=()=>{clearInterval(PR.timer);PR.timer=null;$('prAuto').textContent='自动游走';PR.cur=0;PR.step=0;PR.counts=[0,0,0,0];prRender();};
+prRender();
+
+/* 演示 6：概念例子 · 顾客流失（两状态 MC） */
+const CF={names:['甲店','乙店'],P:[[0.8,0.2],[0.3,0.7]],cur:0,n:0,counts:[0,0],timer:null};
+function cfStep(){const r=Math.random();let acc=0,next=0;
+  for(let j=0;j<2;j++){acc+=CF.P[CF.cur][j];if(r<=acc){next=j;break;}}
+  CF.cur=next;CF.n++;CF.counts[next]++;cfRender();}
+function cfRender(){$('cfN').textContent=CF.n;$('cfCur').textContent=CF.names[CF.cur];
+  const total=CF.n||1;
+  for(let i=0;i<2;i++){const f=CF.counts[i]/total;$(`cfBar${i}`).style.width=(f*100).toFixed(1)+'%';$(`cfVal${i}`).textContent=f.toFixed(3);}}
+$('cfStep').onclick=cfStep;
+$('cfAuto').onclick=()=>{if(CF.timer){clearInterval(CF.timer);CF.timer=null;$('cfAuto').textContent='自动连续流转';return;}
+  $('cfAuto').textContent='暂停';CF.timer=setInterval(cfStep,450);};
+$('cfReset').onclick=()=>{clearInterval(CF.timer);CF.timer=null;$('cfAuto').textContent='自动连续流转';CF.cur=0;CF.n=0;CF.counts=[0,0];cfRender();};
+cfRender();
+
+/* 演示 7：应用案例 · 信用评级转移（批量分布迭代） */
+const RT={pi:[0.4,0.4,0.2,0],n:0};
+function rtAdvance(k){const P=normalizeRows(readMatrix('ratingMatrix'));
+  for(let t=0;t<k;t++)RT.pi=RT.pi.map((_,j)=>RT.pi.reduce((s,x,i)=>s+x*P[i][j],0));
+  RT.n+=k;rtRender();}
+function rtRender(){$('rtN').textContent=RT.n;$('rtDef').textContent=RT.pi[3].toFixed(3);
+  const cols=['#4a90d9','#2c8a8a','#d99a4a','#c0392b'];
+  for(let i=0;i<4;i++){$(`rtBar${i}`).style.width=(RT.pi[i]*100).toFixed(1)+'%';$(`rtBar${i}`).style.background=cols[i];$(`rtVal${i}`).textContent=RT.pi[i].toFixed(3);}}
+$('rtStep').onclick=()=>rtAdvance(1);
+$('rtTen').onclick=()=>rtAdvance(10);
+$('rtReset').onclick=()=>{RT.pi=[0.4,0.4,0.2,0];RT.n=0;rtRender();};
+rtRender();
+</script>
+</body>
+</html>

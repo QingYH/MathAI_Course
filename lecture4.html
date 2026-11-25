@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第四讲 · 部分可观测决策与 POMDP | 人工智能的数学方法</title>
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@600;700&display=swap">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://fastly.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{
+    --bg:#f5f9fc; --card:#ffffff; --ink:#1e2f3d; --sub:#51647a;
+    --primary:#2563a8; --primary-soft:#e6f0f9; --accent:#2c8a8a; --accent-soft:#e4f3f2;
+    --hl:#fff2bf; --hl-ink:#8a5a00; --line:#dbe7f0;
+    --shadow:0 6px 22px rgba(37,99,168,.10); --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:"Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.85;-webkit-text-size-adjust:100%;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 18px;}
+  header.hero{background:linear-gradient(135deg,#2563a8 0%,#2c8a8a 100%);color:#fff;padding:46px 0 38px;}
+  header.hero .kicker{font-size:15px;letter-spacing:3px;opacity:.85;margin-bottom:10px;}
+  header.hero h1{font-size:clamp(26px,4.5vw,38px);font-weight:900;letter-spacing:1px;}
+  header.hero p{margin-top:12px;font-size:clamp(15px,2.2vw,18px);opacity:.92;max-width:760px;}
+  .back-home{display:inline-flex;align-items:center;gap:8px;margin-top:20px;text-decoration:none;color:#fff;border:1px solid rgba(255,255,255,.5);padding:9px 18px;border-radius:999px;font-size:15px;}
+  .back-home:hover{background:rgba(255,255,255,.12);}
+  nav.toc{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;}
+  nav.toc .wrap{display:flex;gap:6px;padding-top:10px;padding-bottom:10px;}
+  nav.toc a{display:inline-block;color:var(--primary);text-decoration:none;font-size:15px;padding:7px 13px;border-radius:20px;flex:0 0 auto;}
+  nav.toc a:hover{background:var(--primary-soft);}
+  section{padding:38px 0 8px;}
+  h2{font-size:clamp(22px,3.2vw,28px);font-weight:900;color:var(--primary);margin-bottom:16px;padding-left:14px;border-left:5px solid var(--accent);}
+  h3{font-size:19px;font-weight:700;color:var(--ink);margin:22px 0 10px;}
+  p{margin:10px 0;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin:18px 0;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px;}
+  .hl{background:var(--hl);color:var(--hl-ink);font-weight:700;padding:1px 6px;border-radius:5px;}
+  .term{color:var(--primary);font-weight:700;}
+  .note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:16px;}
+  .formula{background:#fbfdff;border:1px dashed var(--line);border-radius:12px;padding:14px 16px;margin:14px 0;overflow-x:auto;}
+  ul,ol{padding-left:24px;margin:10px 0;}
+  li{margin:7px 0;}
+  code{background:var(--primary-soft);color:var(--primary);padding:1px 6px;border-radius:5px;font-size:15px;font-family:"SFMono-Regular",Consolas,Menlo,monospace;}
+  pre{background:#1f3346;color:#eaf3fb;border-radius:12px;padding:16px;overflow-x:auto;font-size:14.5px;line-height:1.7;margin:12px 0;font-family:"SFMono-Regular",Consolas,Menlo,monospace;}
+  pre code{background:transparent;color:inherit;padding:0;}
+  table.data{border-collapse:collapse;width:100%;margin:12px 0;font-size:15.5px;}
+  table.data th,table.data td{border:1px solid var(--line);padding:9px 12px;text-align:left;}
+  table.data th{background:var(--primary-soft);color:var(--primary);}
+  .demo-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:14px;}
+  .demo-head h3{margin:0;}
+  .badge{display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:700;padding:3px 10px;border-radius:12px;}
+  button.btn{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;}
+  button.btn.secondary{background:var(--accent);}
+  button.btn.ghost{background:#fff;color:var(--primary);border:1px solid var(--primary);}
+  button.btn.sel{background:var(--accent);color:#fff;border-color:var(--accent);}
+  button.btn:active{transform:scale(.97);}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0;}
+  .stat{font-size:16px;color:var(--sub);}
+  .stat b{color:var(--ink);}
+  table.matrix{border-collapse:collapse;margin:10px 0;}
+  table.matrix td{padding:6px 8px;text-align:center;}
+  table.matrix th{font-size:14px;color:var(--sub);padding:4px;}
+  .obs-chip{display:inline-block;padding:4px 12px;border-radius:14px;background:var(--primary-soft);color:var(--primary);font-size:15px;margin:2px;}
+  .obs-chip.active{background:var(--primary);color:#fff;}
+  .freq-row{display:flex;align-items:center;gap:10px;margin:8px 0;}
+  .freq-row .label{width:70px;font-size:15px;}
+  .freq-bar-bg{flex:1;background:#eef4f9;border-radius:8px;height:22px;overflow:hidden;}
+  .freq-bar{height:100%;border-radius:8px;transition:width .3s;}
+  .freq-row .val{width:150px;text-align:right;font-size:15px;font-variant-numeric:tabular-nums;}
+  .ro-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:520px;margin:0 auto;}
+  .ro-cell{border:1px solid var(--line);border-radius:12px;padding:10px 6px;text-align:center;background:#f2f7fb;}
+  .ro-cell .color{font-weight:700;font-size:16px;}
+  .ro-cell .bar-bg{height:14px;background:#e6eef5;border-radius:7px;margin:6px 0;overflow:hidden;}
+  .ro-cell .bar{height:100%;background:var(--accent);border-radius:7px;transition:width .3s;}
+  .ro-cell .p{font-size:13.5px;font-variant-numeric:tabular-nums;color:var(--sub);}
+  .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:14px;}
+  .kv .box{background:#f6f8f7;border-radius:12px;padding:16px;}
+  .kv .box b{display:block;color:var(--primary);margin-bottom:4px;}
+  details{margin:14px 0;border:1px solid var(--line);border-radius:12px;background:#fbfdff;}
+  summary{cursor:pointer;padding:12px 16px;font-weight:700;color:var(--accent);list-style:none;}
+  summary::before{content:"▸ ";}
+  details[open] summary::before{content:"▾ ";}
+  details[open] summary{border-bottom:1px solid var(--line);}
+  details .solution{padding:12px 16px;}
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .65s ease,transform .65s ease;}
+  .reveal.visible{opacity:1;transform:none;}
+  footer{padding:30px 0 50px;color:var(--sub);font-size:14px;text-align:center;}
+  @media (max-width:640px){
+    body{font-size:16px;}
+    .card{padding:16px;}
+    header.hero{padding:34px 0 28px;}
+    table.data{font-size:14px;}
+    .freq-row .val{width:120px;font-size:13px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">硕士生课程 · 人工智能的数学方法 · 第四讲</div>
+    <h1>部分可观测决策与 POMDP</h1>
+    <p>真实智能体往往只能获得带噪、不完全的观测。本讲先以隐马尔可夫模型（HMM）建立观测与推断的概率基础，再引入信念状态与贝叶斯更新，把决策建立在对隐藏状态的概率推断之上，讨论信念 MDP 的求解难度与近似方法。</p>
+    <a class="back-home" href="人工智能数学方法.html">← 返回课程首页</a>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#sec-intro">课程导入</a>
+    <a href="#sec-symbols">符号说明</a>
+    <a href="#sec-math">数学原理</a>
+    <a href="#sec-cases">经典案例</a>
+    <a href="#sec-algo">核心算法</a>
+    <a href="#sec-demo1">演示·HMM前向</a>
+    <a href="#sec-demo2">演示·Viterbi</a>
+    <a href="#sec-demo3">演示·机器人定位</a>
+    <a href="#sec-demo4">演示·信念更新</a>
+    <a href="#sec-demo5">例子·问诊更新</a>
+    <a href="#sec-demo6">应用·意图跟踪</a>
+    <a href="#sec-ai">AI 应用</a>
+    <a href="#sec-exercise">课堂练习</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- 1. 导入 -->
+<section id="sec-intro">
+  <h2 class="reveal">一、课程导入：看不见完整状态时如何决策</h2>
+  <div class="card reveal">
+    <h3>例子 1：医生根据症状判断病情</h3>
+    <p>真实病情（隐状态）无法直接看到，医生只能观察到体温、化验指标等<span class="term">带噪观测</span>。每获得一项检查结果，就更新一次对各种病情可能性的判断，再据此选择治疗方案。决策依据不是某个确定状态，而是一组状态概率。</p>
+  </div>
+  <div class="card reveal">
+    <h3>例子 2：机器人在走廊里估算自身位置</h3>
+    <p>机器人不知道自己确切在哪一格，只能通过里程计（带噪声的运动）与传感器读数（带噪声的观测）不断修正位置置信度。运动后先预测位置分布，看到路标后再用观测修正——这正是滤波与信念更新的微型版本。</p>
+    <div class="note">前三讲假设智能体可直接观察真实状态；本讲面对<span class="hl">部分可观测</span>情形：状态隐藏，决策建立在信念（状态概率分布）之上。</div>
+  </div>
+</section>
+
+<!-- 2. 符号 -->
+<section id="sec-symbols">
+  <h2 class="reveal">二、符号说明（先读这张表）</h2>
+  <div class="card reveal">
+    <table class="data">
+      <tr><th>符号</th><th>中文含义</th><th>英文 / 说明</th></tr>
+      <tr><td>$A$</td><td>HMM 隐状态转移矩阵</td><td>state transition matrix</td></tr>
+      <tr><td>$B$</td><td>HMM 发射（观测）矩阵</td><td>emission matrix</td></tr>
+      <tr><td>$\pi$</td><td>初始状态分布</td><td>initial distribution</td></tr>
+      <tr><td>$O=(o_1,\dots,o_T)$</td><td>观测序列</td><td>observation sequence</td></tr>
+      <tr><td>$\alpha_t(i)$</td><td>前向概率：到 $t$ 步处于状态 $i$ 的联合概率</td><td>forward probability</td></tr>
+      <tr><td>$\delta_t(i)$</td><td>Viterbi 局部最大概率</td><td>Viterbi variable</td></tr>
+      <tr><td>$\psi_t(i)$</td><td>回溯指针：$\delta_t(i)$ 来自上一步哪个状态</td><td>backpointer</td></tr>
+      <tr><td>$Z(o\mid s',a)$</td><td>观测函数：新状态 $s'$ 下得到观测 $o$ 的概率</td><td>observation function</td></tr>
+      <tr><td>$b(s)$</td><td>信念状态：当前处于状态 $s$ 的概率</td><td>belief state</td></tr>
+      <tr><td>$\tilde b(s')$</td><td>预测步后的先验信念</td><td>predicted belief</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- 3. 数学原理 -->
+<section id="sec-math">
+  <h2 class="reveal">三、数学原理</h2>
+
+  <div class="card reveal">
+    <h3>3.1 概念关系：链、HMM、MDP、POMDP</h3>
+    <ul>
+      <li><span class="term">马尔可夫链</span>：自发转移的随机过程；</li>
+      <li><span class="hl">隐马尔可夫模型（HMM）</span>：隐状态链满足马尔科夫性，每个隐状态按发射概率产生观测；</li>
+      <li><span class="term">MDP</span>：转移受动作控制，但状态可直接观测；</li>
+      <li><span class="hl">POMDP</span>：在 MDP 基础上状态不可直接观测，只能得到带噪观测。</li>
+    </ul>
+    <p>退化关系：观测无噪声时 POMDP 退化为 MDP；去掉动作控制则退化为 HMM。</p>
+  </div>
+
+  <div class="card reveal">
+    <h3>3.2 HMM 三个基本问题</h3>
+    <ol>
+      <li><span class="term">评估问题</span>：给定模型 $\lambda=(A,B,\pi)$，计算观测序列概率 $P(O\mid\lambda)$ —— 前向 / 后向算法；</li>
+      <li><span class="term">解码问题</span>：求最可能的隐状态序列 —— Viterbi 算法；</li>
+      <li><span class="term">学习问题</span>：从数据估计模型参数 —— Baum–Welch 算法（EM 的一种）。</li>
+    </ol>
+  </div>
+
+  <div class="card reveal">
+    <h3>3.3 前向概率与前向算法</h3>
+    <p>定义前向概率 $\alpha_t(i)=P(o_1,\dots,o_t,q_t=i\mid\lambda)$，递推为：</p>
+    <div class="formula">$$\alpha_1(i)=\pi_i B_i(o_1)$$</div>
+    <div class="formula">$$\alpha_t(j)=B_j(o_t)\sum_i\alpha_{t-1}(i)a_{ij}$$</div>
+    <p>观测序列概率为 $P(O\mid\lambda)=\sum_i\alpha_T(i)$。</p>
+  </div>
+
+  <div class="card reveal">
+    <h3>3.4 Viterbi 解码</h3>
+    <p>每一步保留到达各隐状态的最大概率 $\delta_t(j)$，并用指针 $\psi_t(j)$ 记录来源：</p>
+    <div class="formula">$$\delta_t(j)=B_j(o_t)\max_i\big[\delta_{t-1}(i)a_{ij}\big],\qquad \psi_t(j)=\arg\max_i\delta_{t-1}(i)a_{ij}$$</div>
+    <p>最后从 $\delta_T$ 最大的状态出发，沿 $\psi$ 指针回溯，得到最可能的隐状态路径。</p>
+  </div>
+
+  <div class="card reveal">
+    <h3>3.5 POMDP 七元组与信念状态</h3>
+    <p>POMDP 在 MDP 基础上增加观测集与观测函数：</p>
+    <div class="formula">$$\mathcal{P}=\langle\mathcal{S},\mathcal{A},\mathcal{O},Z(o\mid s',a),T(s'\mid s,a),R(s,a),\gamma\rangle$$</div>
+    <p>由于真实状态不可获知，智能体维护关于状态的概率分布——<span class="hl-t">信念状态</span>：</p>
+    <div class="formula">$$b(s)=\Pr(S_t=s\mid O_{1:t},A_{0:t-1})$$</div>
+    <p>信念是历史观测与动作的充分统计量，有了信念便不必保留完整历史。</p>
+  </div>
+
+  <div class="card reveal">
+    <h3>3.6 信念更新：预测步与观测步</h3>
+    <p>执行动作 $a$ 后先做<span class="hl">预测步</span>：</p>
+    <div class="formula">$$\tilde b(s')=\sum_{s\in\mathcal{S}}T(s'\mid s,a)\,b(s)$$</div>
+    <p>获得观测 $o$ 后做<span class="hl">观测步</span>（贝叶斯修正并归一化）：</p>
+    <div class="formula">$$b'(s')=\frac{Z(o\mid s',a)\,\tilde b(s')}{\Pr(o\mid b,a)},\qquad \Pr(o\mid b,a)=\sum_{s'}Z(o\mid s',a)\,\tilde b(s')$$</div>
+  </div>
+
+  <div class="card reveal">
+    <h3>3.7 信念 MDP 与求解难度</h3>
+    <p>把信念 $b$ 视为新状态，得到连续状态的<span class="hl-t">信念 MDP</span>，价值定义在信念单纯形上：</p>
+    <div class="formula">$$V(b)=\max_a\left[\sum_s b(s)R(s,a)+\gamma\sum_o\Pr(o\mid b,a)V(b')\right]$$</div>
+    <ul>
+      <li>有限状态 POMDP 的最优价值函数是<span class="hl">分段线性且凸（PWLC）</span>的；</li>
+      <li>信念空间随状态数指数增长，精确求解一般为 <span class="hl">PSPACE 难</span>；</li>
+      <li>近似途径：点值迭代（PBVI）、蒙特卡洛规划、在线重规划，以及用循环 / Transformer 网络压缩历史的深度方法。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 4. 经典案例 -->
+<section id="sec-cases">
+  <h2 class="reveal">四、四个经典建模案例</h2>
+  <div class="grid">
+    <div class="card reveal"><h3>案例 1：由“是否带伞”推断天气</h3><p>隐状态为晴 / 雨，观测为带伞 / 不带伞，用前向算法计算观测序列概率，用 Viterbi 反推最可能天气路径。</p></div>
+    <div class="card reveal"><h3>案例 2：移动机器人定位</h3><p>位置不可精确获知，运动模型做预测、传感器读数做修正，信念分布随滤波不断收敛到真实位置附近。</p></div>
+    <div class="card reveal"><h3>案例 3：医疗诊断决策</h3><p>病理状态隐藏，检查结果是带噪观测；在病情信念上安排检查与治疗，平衡信息获取、疗效与成本。</p></div>
+    <div class="card reveal"><h3>案例 4：对话状态跟踪</h3><p>用户意图是隐状态，语音识别与文本是观测；系统维护意图信念并据此选择回复动作，是对话管理的常见建模方式。</p></div>
+  </div>
+</section>
+
+<!-- 5. 核心算法 -->
+<section id="sec-algo">
+  <h2 class="reveal">五、具体算法</h2>
+  <div class="grid">
+    <div class="card reveal">
+      <h3>算法 1：前向算法（评估）</h3>
+      <ol>
+        <li>初始化 $\alpha_1(i)=\pi_i B_i(o_1)$；</li>
+        <li>递推 $\alpha_t(j)=B_j(o_t)\sum_i\alpha_{t-1}(i)a_{ij}$；</li>
+        <li>求和得 $P(O\mid\lambda)=\sum_i\alpha_T(i)$。</li>
+      </ol>
+    </div>
+    <div class="card reveal">
+      <h3>算法 2：Viterbi 解码</h3>
+      <ol>
+        <li>初始化 $\delta_1(i)=\pi_i B_i(o_1)$；</li>
+        <li>递推 $\delta_t(j)$ 并记录指针 $\psi_t(j)$；</li>
+        <li>从终点最大 $\delta_T$ 沿指针回溯最优路径。</li>
+      </ol>
+    </div>
+    <div class="card reveal">
+      <h3>算法 3：信念滤波更新</h3>
+      <ol>
+        <li>预测：$\tilde b(s')=\sum_s T(s'\mid s,a)b(s)$；</li>
+        <li>观测：$b'(s')\propto Z(o\mid s',a)\tilde b(s')$；</li>
+        <li>归一化后作为下一步信念。</li>
+      </ol>
+    </div>
+    <div class="card reveal">
+      <h3>算法 4：近似求解（概览）</h3>
+      <p>信念空间过大时，用点值迭代在代表性信念点上维护价值片段，或用蒙特卡洛在线规划采样候选动作；深度方法则用循环网络把历史压缩为隐状态。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6. 演示 1：HMM 前向 -->
+<section id="sec-demo1">
+  <h2 class="reveal">六、交互演示 1：HMM · 前向算法</h2>
+  <div class="card reveal">
+    <div class="demo-head"><span class="badge">Forward Algorithm</span><h3>由“是否带伞”推断隐藏天气的概率演化</h3></div>
+    <p><strong>隐状态</strong>：{晴, 雨}；<strong>观测</strong>：{带伞, 不带伞}。模型参数：$\pi=(0.6,0.4)$，$A$ 为状态转移矩阵，$B$ 为发射矩阵。</p>
+    <div class="grid">
+      <div>
+        <table class="matrix">
+          <tr><th>$A$ 转移</th><th>→ 晴</th><th>→ 雨</th></tr>
+          <tr><th>晴</th><td>0.7</td><td>0.3</td></tr>
+          <tr><th>雨</th><td>0.4</td><td>0.6</td></tr>
+        </table>
+      </div>
+      <div>
+        <table class="matrix">
+          <tr><th>$B$ 发射</th><th>带伞</th><th>不带伞</th></tr>
+          <tr><th>晴</th><td>0.2</td><td>0.8</td></tr>
+          <tr><th>雨</th><td>0.9</td><td>0.1</td></tr>
+        </table>
+      </div>
+    </div>
+    <p>观测序列 $O=$ <span id="hmmObs"></span>。点击“前向一步”，按 $\alpha_t(j)=B_j(o_t)\sum_i\alpha_{t-1}(i)a_{ij}$ 逐步递推。</p>
+    <div class="controls">
+      <button class="btn" id="hmmStep">前向一步</button>
+      <button class="btn secondary" id="hmmAuto">自动递推</button>
+      <button class="btn ghost" id="hmmReset">重置</button>
+      <span class="stat">已处理步数：<b id="hmmN">0</b> / 3</span>
+    </div>
+    <table class="data" id="hmmTable">
+      <tr><th>隐状态</th><th>$\alpha_1$</th><th>$\alpha_2$</th><th>$\alpha_3$</th></tr>
+      <tr><td>晴</td><td id="hmm0_1">—</td><td id="hmm0_2">—</td><td id="hmm0_3">—</td></tr>
+      <tr><td>雨</td><td id="hmm1_1">—</td><td id="hmm1_2">—</td><td id="hmm1_3">—</td></tr>
+    </table>
+    <div class="note" id="hmmResult">递推完成后，$P(O\mid\lambda)=\sum_i\alpha_3(i)$，即该观测序列在当前模型下出现的概率。</div>
+  </div>
+</section>
+
+<!-- 7. 演示 2：Viterbi -->
+<section id="sec-demo2">
+  <h2 class="reveal">七、交互演示 2：HMM · Viterbi 最优路径解码</h2>
+  <div class="card reveal">
+    <div class="demo-head"><span class="badge">Viterbi Algorithm</span><h3>由观测序列反推最可能的隐藏天气路径</h3></div>
+    <p>沿用演示 1 的模型与观测序列 $O=$ <span id="vtObs"></span>。每步保留到达各隐状态的最大概率 $\delta_t(j)$，并用指针 $\psi_t(j)$ 记录来源；最后一步结束后自动回溯最可能路径。</p>
+    <div class="controls">
+      <button class="btn" id="vtStep">递推一步</button>
+      <button class="btn secondary" id="vtAuto">自动递推</button>
+      <button class="btn ghost" id="vtReset">重置</button>
+      <span class="stat">已处理步数：<b id="vtN">0</b> / 3</span>
+    </div>
+    <table class="data" id="vtTable">
+      <tr><th>隐状态</th><th>$\delta_1$ / $\psi_1$</th><th>$\delta_2$ / $\psi_2$</th><th>$\delta_3$ / $\psi_3$</th></tr>
+      <tr><td>晴</td><td id="vt0_1">—</td><td id="vt0_2">—</td><td id="vt0_3">—</td></tr>
+      <tr><td>雨</td><td id="vt1_1">—</td><td id="vt1_2">—</td><td id="vt1_3">—</td></tr>
+    </table>
+    <div class="note" id="vtResult">递推完成后，从 $\delta_3$ 最大的状态出发，沿 $\psi$ 指针回溯，即得到最可能的隐状态序列。</div>
+  </div>
+</section>
+
+<!-- 8. 演示 3：机器人定位 -->
+<section id="sec-demo3">
+  <h2 class="reveal">八、交互演示 3：一维机器人定位（贝叶斯滤波）</h2>
+  <div class="card reveal">
+    <div class="demo-head"><span class="badge">状态估计</span><h3>带噪声的移动与观测，逐步修正位置置信度</h3></div>
+    <p>机器人在一排 5 个房间中，房间颜色绿 / 红交替。机器人<strong>不知道自己在哪</strong>，初始对 5 个位置等置信度。点击“执行右移”做运动预测（0.8 右移、0.1 不动、0.1 左移）；点击“观测：绿 / 红”用传感器读数修正置信度（颜色匹配 0.7，不匹配 0.3，随后归一化）。条高即处于该房间的后验概率。</p>
+    <div class="controls">
+      <button class="btn" id="roMove">执行右移（预测）</button>
+      <button class="btn secondary" id="roSenseG">观测：绿</button>
+      <button class="btn secondary" id="roSenseR">观测：红</button>
+      <button class="btn ghost" id="roReset">重置</button>
+      <span class="stat">更新次数：<b id="roN">0</b></span>
+    </div>
+    <div class="ro-row" id="roRow"></div>
+    <div class="note">这是自主导航中蒙特卡洛定位 / 贝叶斯滤波的微型版本：运动模型对应状态转移，观测更新对应发射概率，两者交替递推。</div>
+  </div>
+</section>
+
+<!-- 9. 演示 4：POMDP 信念更新 -->
+<section id="sec-demo4">
+  <h2 class="reveal">九、交互演示 4：两状态 POMDP 信念更新</h2>
+  <div class="card reveal">
+    <div class="demo-head"><span class="badge">预测 + 贝叶斯修正</span><h3>选动作、收观测，观察信念分布更新</h3></div>
+    <p>隐藏状态为 $A$ 或 $B$。先选动作 $a_1/a_2$，再选实际收到的观测 $o_1/o_2$，信念经预测步与贝叶斯修正更新。初始信念 $b=(0.5,0.5)$。</p>
+    <div class="controls">
+      <label class="stat">动作：</label>
+      <button class="btn sel" id="pA1">动作 a1</button>
+      <button class="btn" id="pA2">动作 a2</button>
+      <label class="stat" style="margin-left:14px;">观测：</label>
+      <button class="btn sel" id="pO1">观测 o1</button>
+      <button class="btn" id="pO2">观测 o2</button>
+      <button class="btn secondary" id="pStep">执行一步更新</button>
+      <button class="btn ghost" id="pReset">重置信念</button>
+    </div>
+    <div class="freq-row"><span class="label">b(A)</span><div class="freq-bar-bg"><div class="freq-bar" id="barA" style="background:#4a90d9;width:50%"></div></div><span class="val" id="valA">0.500</span></div>
+    <div class="freq-row"><span class="label">b(B)</span><div class="freq-bar-bg"><div class="freq-bar" id="barB" style="background:#2c8a8a;width:50%"></div></div><span class="val" id="valB">0.500</span></div>
+    <div class="kv">
+      <div class="box"><b>预测 b̃(A)</b><span id="predA">—</span></div>
+      <div class="box"><b>预测 b̃(B)</b><span id="predB">—</span></div>
+      <div class="box"><b>归一化常数</b><span id="normP">—</span></div>
+      <div class="box"><b>更新步数</b><span id="pStepNo">0</span></div>
+    </div>
+    <div class="note" id="pLog">选择动作与观测后，点击“执行一步更新”。</div>
+  </div>
+</section>
+
+<!-- 11. 演示 5：概念例子 · 问诊贝叶斯更新 -->
+<section id="sec-demo5">
+  <h2 class="reveal">十一、易理解的交互例子：医生问诊，逐步更新病情信念</h2>
+  <div class="card reveal">
+    <div class="demo-head"><span class="badge">贝叶斯修正</span><h3>两个候选疾病，靠症状证据不断修正后验</h3></div>
+    <p>隐状态为两种疾病：<span class="term">感冒</span>、<span class="term">过敏</span>，初始先验各 0.5。每点击一个症状，就用该症状在两种疾病下的似然对当前信念加权并归一化：$b'(s)\propto Z(o\mid s)b(s)$。可连续点击多个症状，观察后验如何随证据向某一疾病集中。</p>
+    <table class="data">
+      <tr><th>症状观测</th><th>$Z(\text{症状}\mid\text{感冒})$</th><th>$Z(\text{症状}\mid\text{过敏})$</th></tr>
+      <tr><td>发烧</td><td>0.8</td><td>0.2</td></tr>
+      <tr><td>打喷嚏</td><td>0.4</td><td>0.9</td></tr>
+    </table>
+    <div class="controls">
+      <button class="btn" id="docFever">出现：发烧</button>
+      <button class="btn secondary" id="docSneeze">出现：打喷嚏</button>
+      <button class="btn ghost" id="docReset">重置信念</button>
+      <span class="stat">已收集证据：<b id="docN">0</b> 项</span>
+    </div>
+    <div class="freq-row"><span class="label">感冒</span><div class="freq-bar-bg"><div class="freq-bar" id="docBar0" style="background:#4a90d9;width:50%"></div></div><span class="val" id="docVal0">0.500</span></div>
+    <div class="freq-row"><span class="label">过敏</span><div class="freq-bar-bg"><div class="freq-bar" id="docBar1" style="background:#2c8a8a;width:50%"></div></div><span class="val" id="docVal1">0.500</span></div>
+    <div class="note" id="docLog">初始对两种疾病等概率；加入证据后，似然更高的疾病后验上升。这就是 HMM / POMDP 中观测步在单步、无动作情形下的直观版本。</div>
+  </div>
+</section>
+
+<!-- 12. 演示 6：应用案例 · 对话意图跟踪 -->
+<section id="sec-demo6">
+  <h2 class="reveal">十二、可交互的应用案例：对话系统的意图信念跟踪</h2>
+  <div class="card reveal">
+    <div class="demo-head"><span class="badge">对话状态跟踪</span><h3>根据用户关键词，更新三种意图的后验概率</h3></div>
+    <p>用户真实意图是隐状态：<span class="term">订票</span>、<span class="term">退票</span>、<span class="term">查询</span>；识别出的关键词是带噪观测。初始三种意图等概率，每点一个关键词，按似然加权归一化，更新意图信念。系统据此选择回复动作（订票流程 / 退票流程 / 信息查询）。</p>
+    <table class="data">
+      <tr><th>关键词观测</th><th>订票</th><th>退票</th><th>查询</th></tr>
+      <tr><td>“机票”</td><td>0.7</td><td>0.1</td><td>0.2</td></tr>
+      <tr><td>“退”</td><td>0.1</td><td>0.8</td><td>0.1</td></tr>
+      <tr><td>“几点”</td><td>0.2</td><td>0.1</td><td>0.7</td></tr>
+    </table>
+    <div class="controls">
+      <button class="btn" id="utKw0">用户说：“机票”</button>
+      <button class="btn secondary" id="utKw1">用户说：“退”</button>
+      <button class="btn secondary" id="utKw2">用户说：“几点”</button>
+      <button class="btn ghost" id="utReset">重置</button>
+      <span class="stat">已识别关键词：<b id="utN">0</b> 个</span>
+    </div>
+    <div class="freq-row"><span class="label">订票</span><div class="freq-bar-bg"><div class="freq-bar" id="utBar0" style="background:#4a90d9;width:33.3%"></div></div><span class="val" id="utVal0">0.333</span></div>
+    <div class="freq-row"><span class="label">退票</span><div class="freq-bar-bg"><div class="freq-bar" id="utBar1" style="background:#c0392b;width:33.3%"></div></div><span class="val" id="utVal1">0.333</span></div>
+    <div class="freq-row"><span class="label">查询</span><div class="freq-bar-bg"><div class="freq-bar" id="utBar2" style="background:#d99a4a;width:33.3%"></div></div><span class="val" id="utVal2">0.333</span></div>
+    <div class="note" id="utLog">多个关键词互相印证后，某一意图信念占优；当信念仍较分散时，系统可主动追问以获取更多观测，降低不确定性。</div>
+  </div>
+</section>
+
+<!-- 13. AI 应用 -->
+<section id="sec-ai">
+  <h2 class="reveal">十、部分可观测方法在人工智能中的应用</h2>
+  <div class="grid">
+    <div class="card reveal"><h3>10.1 语音识别与词性标注</h3><p>声学信号 / 词语是观测，音素 / 词性是隐状态；HMM 前向与 Viterbi 是早期语音识别与序列标注的核心算法。</p></div>
+    <div class="card reveal"><h3>10.2 医疗诊断决策</h3><p>病情为隐状态，检查结果为观测；POMDP 框架用于安排检查与治疗，平衡信息获取、疗效与成本。</p></div>
+    <div class="card reveal"><h3>10.3 对话状态跟踪</h3><p>用户意图为隐状态，识别文本为观测；系统维护意图信念并选择回复动作，是任务型对话管理的常见建模。</p></div>
+    <div class="card reveal"><h3>10.4 金融与生物序列</h3><p>市场状态、基因结构等不可直接观测，常用 HMM 刻画隐状态转移与观测生成，做状态识别与异常检测。</p></div>
+  </div>
+</section>
+
+<!-- 11. 练习 -->
+<section id="sec-exercise">
+  <h2 class="reveal">十一、课堂练习（含详解）</h2>
+  <div class="card reveal">
+    <p>练习 1、2、5、6 为课堂手算 / 推导，练习 4、7 可在 30 分钟内用 Python 完成，练习 3 为概念讨论。每道题都附有可折叠的详细解答过程。</p>
+
+    <h3>练习 1：前向概率手算（手算）</h3>
+    <p>沿用演示 1 参数，观测 $O=(\text{带伞},\text{不带伞},\text{带伞})$。手算第一步 $\alpha_1$，并说明 $P(O\mid\lambda)$ 如何由 $\alpha_3$ 求和得到。</p>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p>第 1 步（观测“带伞”）：$\alpha_1=(0.6\times0.2,\;0.4\times0.9)=(0.1200,\;0.3600)$。继续递推可得 $\alpha_3=(0.027552,\;0.062856)$，故 $P(O\mid\lambda)=0.090408$。</p>
+    </div></details>
+
+    <h3>练习 2：信念更新计算（手算）</h3>
+    <p>设 $b(A)=0.6,\ b(B)=0.4$；动作 $a_1$ 下 $T(A\mid A)=0.7,\ T(B\mid A)=0.3,\ T(A\mid B)=0.3,\ T(B\mid B)=0.7$；观测 $o_1$ 似然 $Z(o_1\mid A)=0.8,\ Z(o_1\mid B)=0.3$。求预测信念与收到 $o_1$ 后的后验信念。</p>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p>预测：$\tilde b(A)=0.6\times0.7+0.4\times0.3=0.54$，$\tilde b(B)=0.46$。似然加权：$0.54\times0.8=0.432$，$0.46\times0.3=0.138$，归一化常数 $0.570$。后验：$b'(A)\approx0.758$，$b'(B)\approx0.242$。</p>
+    </div></details>
+
+    <h3>练习 3：Viterbi 路径（对照演示）</h3>
+    <p>观察演示 2 的 $\delta$ 与 $\psi$ 表，说明回溯顺序：为什么要从最后一步最大 $\delta_T$ 的状态出发，而不是从第一步开始正向选最大？</p>
+    <details><summary>参考要点</summary><div class="solution">
+      <p>Viterbi 求的是整条路径的联合概率最大，局部最优不等于全局最优。$\delta_t(j)$ 已汇总到达 $j$ 的最优前缀，$\psi$ 记录其来源；只有从终点最优状态反向回溯，才能还原出全局最优的完整隐状态序列。</p>
+    </div></details>
+
+    <h3>练习 4：信念 MDP 编程框架（进阶 · 编程）</h3>
+    <p>对两状态 POMDP 实现信念更新函数：输入当前信念、动作、观测与 $T,Z$ 矩阵，输出归一化后验信念。</p>
+<pre><code>def belief_update(b, a, o, T, Z):
+    tilde = [sum(T[s2][s][a] * b[s] for s in range(len(b)))
+             for s2 in range(len(b))]
+    weighted = [Z[s2][o][a] * tilde[s2] for s2 in range(len(b))]
+    norm = sum(weighted)
+    return [w / norm for w in weighted]</code></pre>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p>先按转移核做预测（先验），再用观测似然加权，最后除以边际似然 $\Pr(o\mid b,a)$ 归一化。可代入演示 4 的数值，与页面结果互相校验。</p>
+    </div></details>
+
+    <h3>练习 5：单次观测的贝叶斯后验（手算题）</h3>
+    <p>设先验 $P(\text{感冒})=0.6$，$P(\text{过敏})=0.4$。观测到“发烧”，似然 $Z(\text{发烧}\mid\text{感冒})=0.8$，$Z(\text{发烧}\mid\text{过敏})=0.2$。求发烧后两种疾病的后验概率。</p>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p>似然加权（未归一化）：</p>
+      <p>$$\tilde b(\text{感冒})=0.6\times0.8=0.48,\qquad \tilde b(\text{过敏})=0.4\times0.2=0.08$$</p>
+      <p>归一化常数 $\Pr(\text{发烧})=0.48+0.08=0.56$，故</p>
+      <p>$$b'(\text{感冒})=\frac{0.48}{0.56}\approx0.857,\qquad b'(\text{过敏})=\frac{0.08}{0.56}\approx0.143$$</p>
+      <p>发烧这一证据把信念明显推向“感冒”。注意后验 = 先验 × 似然，再除以证据的边际概率。</p>
+    </div></details>
+
+    <h3>练习 6：连续两条证据的信念更新（手算题）</h3>
+    <p>沿用练习 5：发烧后信念为 $b(\text{感冒})\approx0.857,\ b(\text{过敏})\approx0.143$。随后又观测到“打喷嚏”，似然 $Z(\text{打喷嚏}\mid\text{感冒})=0.4$，$Z(\text{打喷嚏}\mid\text{过敏})=0.9$（假设两症状在给定疾病下条件独立）。求更新后的后验。</p>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p>以发烧后的后验作为新先验，再次似然加权：</p>
+      <p>$$\tilde b(\text{感冒})=0.857\times0.4\approx0.343,\qquad \tilde b(\text{过敏})=0.143\times0.9\approx0.129$$</p>
+      <p>归一化常数 $\approx0.343+0.129=0.472$，故</p>
+      <p>$$b''(\text{感冒})\approx\frac{0.343}{0.472}\approx0.727,\qquad b''(\text{过敏})\approx\frac{0.129}{0.472}\approx0.273$$</p>
+      <p>“打喷嚏”更符合过敏，把过敏后验从 0.143 拉回到 0.273，但感冒仍占优。多条证据按贝叶斯公式逐条累积，正是信念滤波的递推过程。</p>
+    </div></details>
+
+    <h3>练习 7：三状态意图信念更新（编程）</h3>
+    <p>对演示 6 的三意图模型，实现一个通用信念更新函数：输入当前信念向量、观测关键词对应的似然向量，输出归一化后验；再依次输入“机票”“退”两个关键词，打印每一步的意图信念。</p>
+<pre><code>def update(b, lik):
+    w = [lik[i] * b[i] for i in range(len(b))]
+    norm = sum(w)
+    return [x / norm for x in w]
+
+b = [1/3, 1/3, 1/3]
+b = update(b, [0.7, 0.1, 0.2])   # “机票”
+b = update(b, [0.1, 0.8, 0.1])   # “退”
+print([round(x, 3) for x in b])</code></pre>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p>第一步“机票”后：加权 $(0.2333,0.0333,0.0667)$，归一化常数 $0.3333$，信念 $\approx(0.700,0.100,0.200)$。第二步“退”后：加权 $(0.0700,0.0800,0.0200)$，常数 $0.1700$，信念 $\approx(0.412,0.471,0.118)$。两条相互矛盾的证据使“订票”与“退票”信念接近，系统此时通常会追问以进一步区分意图。</p>
+    </div></details>
+
+    <div class="note">思考题：信念熵越高代表不确定性越强。为什么 POMDP 最优策略可能主动选择“获取信息”的动作，而不只追求即时奖励？这与纯贪心 MDP 策略有何不同？</div>
+  </div>
+</section>
+
+</main>
+
+<footer><div class="wrap">硕士生课程《人工智能的数学方法》· 第四讲 部分可观测决策与 POMDP · 公式由 MathJax 渲染</div></footer>
+
+<script>
+const $ = id => document.getElementById(id);
+const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* 演示 1：HMM 前向 */
+const HMM={pi:[0.6,0.4],A:[[0.7,0.3],[0.4,0.6]],B:[[0.2,0.8],[0.9,0.1]],O:[0,1,0],obsName:['带伞','不带伞'],states:['晴','雨'],alpha:null,k:0,timer:null};
+function hmmRenderObs(){$('hmmObs').innerHTML=HMM.O.map((o,i)=>`<span class="obs-chip ${i<HMM.k?'active':''}">${HMM.obsName[o]}</span>`).join(' → ');}
+function hmmStep(){
+  if(HMM.k>=3)return;
+  if(HMM.k===0){HMM.alpha=HMM.pi.map((p,i)=>p*HMM.B[i][HMM.O[0]]);}
+  else{const t=HMM.k;
+    HMM.alpha=HMM.alpha.map((_,j)=>{const sum=HMM.alpha.reduce((s,a,i)=>s+a*HMM.A[i][j],0);return HMM.B[j][HMM.O[t]]*sum;});}
+  HMM.k++;hmmRender();
+}
+function hmmRender(){
+  hmmRenderObs();$('hmmN').textContent=HMM.k;
+  for(let i=0;i<2;i++)for(let t=1;t<=3;t++){const cell=$(`hmm${i}_${t}`);cell.textContent=HMM.k>=t?HMM.alpha[i].toFixed(4):'—';}
+  const box=$('hmmResult');
+  if(HMM.k>=3){const p=HMM.alpha.reduce((a,b)=>a+b,0);
+    box.innerHTML='递推完成：$P(O\\mid\\lambda)=\\sum_i\\alpha_3(i)='+p.toFixed(6)+'$，即该观测序列在当前模型下出现的概率。';
+    if(window.MathJax)MathJax.typeset([box]);}
+  else box.textContent='递推完成后，P(O|λ) 等于各状态第三步前向概率之和。';
+}
+$('hmmStep').onclick=hmmStep;
+$('hmmAuto').onclick=()=>{if(HMM.timer){clearInterval(HMM.timer);HMM.timer=null;$('hmmAuto').textContent='自动递推';return;}
+  $('hmmAuto').textContent='暂停';HMM.timer=setInterval(()=>{if(HMM.k>=3){clearInterval(HMM.timer);HMM.timer=null;$('hmmAuto').textContent='自动递推';return;}hmmStep();},700);};
+$('hmmReset').onclick=()=>{clearInterval(HMM.timer);HMM.timer=null;$('hmmAuto').textContent='自动递推';HMM.alpha=null;HMM.k=0;hmmRender();};
+hmmRender();
+
+/* 演示 2：Viterbi */
+const VT={pi:[0.6,0.4],A:[[0.7,0.3],[0.4,0.6]],B:[[0.2,0.8],[0.9,0.1]],O:[0,1,0],obsName:['带伞','不带伞'],states:['晴','雨'],delta:[],psi:[],k:0,timer:null};
+function vtRenderObs(){$('vtObs').innerHTML=VT.O.map((o,i)=>`<span class="obs-chip ${i<VT.k?'active':''}">${VT.obsName[o]}</span>`).join(' → ');}
+function vtStep(){
+  if(VT.k>=3)return;
+  if(VT.k===0){VT.delta[0]=VT.pi.map((p,i)=>p*VT.B[i][VT.O[0]]);VT.psi[0]=[-1,-1];}
+  else{const t=VT.k;VT.delta[t]=[];VT.psi[t]=[];
+    for(let j=0;j<2;j++){let best=-1,bi=-1;
+      for(let i=0;i<2;i++){const v=VT.delta[t-1][i]*VT.A[i][j];if(v>best){best=v;bi=i;}}
+      VT.delta[t][j]=VT.B[j][VT.O[t]]*best;VT.psi[t][j]=bi;}}
+  VT.k++;vtRender();
+}
+function vtRender(){
+  vtRenderObs();$('vtN').textContent=VT.k;
+  for(let i=0;i<2;i++)for(let t=1;t<=3;t++){const cell=$(`vt${i}_${t}`);
+    if(VT.k>=t){const d=VT.delta[t-1][i].toFixed(5);const ps=VT.psi[t-1][i];
+      cell.textContent=t===1?d:`${d} ← ${ps<0?'—':VT.states[ps]}`;}
+    else cell.textContent='—';}
+  const box=$('vtResult');
+  if(VT.k>=3){let last=VT.delta[2][0]>VT.delta[2][1]?0:1;const path=[last];
+    for(let t=2;t>=1;t--){last=VT.psi[t][last];path.unshift(last);}
+    const txt=path.map(i=>VT.states[i]).join(' → ');
+    box.innerHTML='回溯得到最可能隐状态路径：<b>'+txt+'</b>（对应观测：'+VT.O.map(o=>VT.obsName[o]).join(' → ')+'）。';}
+  else box.textContent='递推完成后，从 δ3 最大的状态出发，沿 ψ 指针回溯即得最优隐状态序列。';
+}
+$('vtStep').onclick=vtStep;
+$('vtAuto').onclick=()=>{if(VT.timer){clearInterval(VT.timer);VT.timer=null;$('vtAuto').textContent='自动递推';return;}
+  $('vtAuto').textContent='暂停';VT.timer=setInterval(()=>{if(VT.k>=3){clearInterval(VT.timer);VT.timer=null;$('vtAuto').textContent='自动递推';return;}vtStep();},700);};
+$('vtReset').onclick=()=>{clearInterval(VT.timer);VT.timer=null;$('vtAuto').textContent='自动递推';VT.delta=[];VT.psi=[];VT.k=0;vtRender();};
+vtRender();
+
+/* 演示 3：机器人定位 */
+const RO={colors:['绿','红','绿','红','绿'],b:new Array(5).fill(0.2),n:0};
+function roRender(){
+  const row=$('roRow');row.innerHTML='';
+  RO.b.forEach((p,x)=>{const div=document.createElement('div');div.className='ro-cell';
+    const colorDot=RO.colors[x]==='绿'?'#2c8a8a':'#c0392b';
+    div.innerHTML=`<div class="color" style="color:${colorDot}">${RO.colors[x]}</div>
+      <div class="bar-bg"><div class="bar" style="width:${(p*100).toFixed(1)}%"></div></div>
+      <div class="p">${p.toFixed(3)}</div>`;
+    row.appendChild(div);});
+  $('roN').textContent=RO.n;
+}
+function roPredict(){
+  const nb=new Array(5).fill(0);
+  for(let x=0;x<5;x++){const moves=[[x-1,0.1],[x,0.1],[x+1,0.8]];
+    for(const[nx,p]of moves){if(nx>=0&&nx<5)nb[nx]+=RO.b[x]*p;else nb[x]+=RO.b[x]*p;}}
+  RO.b=nb;RO.n++;roRender();
+}
+function roSense(color){
+  const nb=RO.b.map((v,x)=>v*(RO.colors[x]===color?0.7:0.3));
+  const s=nb.reduce((a,c)=>a+c,0);RO.b=nb.map(v=>v/s);RO.n++;roRender();
+}
+$('roMove').onclick=roPredict;
+$('roSenseG').onclick=()=>roSense('绿');
+$('roSenseR').onclick=()=>roSense('红');
+$('roReset').onclick=()=>{RO.b=new Array(5).fill(0.2);RO.n=0;roRender();};
+roRender();
+
+/* 演示 4：POMDP 信念更新 */
+const PT={
+  a1:[[0.7,0.3],[0.3,0.7]],
+  a2:[[0.4,0.6],[0.6,0.4]]
+};
+const PZ={
+  a1:{o1:[0.8,0.3],o2:[0.2,0.7]},
+  a2:{o1:[0.6,0.4],o2:[0.4,0.6]}
+};
+let PB=[0.5,0.5], pStep=0, pCurA='a1', pCurO='o1';
+function pRender(){
+  $('barA').style.width=(PB[0]*100)+'%';$('valA').textContent=PB[0].toFixed(3);
+  $('barB').style.width=(PB[1]*100)+'%';$('valB').textContent=PB[1].toFixed(3);
+  $('pStepNo').textContent=pStep;
+}
+$('pA1').onclick=()=>{pCurA='a1';$('pA1').classList.add('sel');$('pA2').classList.remove('sel');};
+$('pA2').onclick=()=>{pCurA='a2';$('pA2').classList.add('sel');$('pA1').classList.remove('sel');};
+$('pO1').onclick=()=>{pCurO='o1';$('pO1').classList.add('sel');$('pO2').classList.remove('sel');};
+$('pO2').onclick=()=>{pCurO='o2';$('pO2').classList.add('sel');$('pO1').classList.remove('sel');};
+$('pStep').onclick=()=>{
+  const pred=[0,0];
+  for(let s=0;s<2;s++)for(let sp=0;sp<2;sp++)pred[sp]+=PT[pCurA][s][sp]*PB[s];
+  const lik=PZ[pCurA][pCurO];
+  const w=[pred[0]*lik[0],pred[1]*lik[1]];
+  const norm=w[0]+w[1];
+  PB=[w[0]/norm,w[1]/norm];pStep++;
+  $('predA').textContent=pred[0].toFixed(3);$('predB').textContent=pred[1].toFixed(3);
+  $('normP').textContent=norm.toFixed(3);
+  $('pLog').innerHTML=`动作 <b>${pCurA}</b>，观测 <b>${pCurO}</b>：预测 b̃=(${pred[0].toFixed(3)}, ${pred[1].toFixed(3)})，似然加权归一化后后验 b=(${PB[0].toFixed(3)}, ${PB[1].toFixed(3)})。`;
+  pRender();
+};
+$('pReset').onclick=()=>{PB=[0.5,0.5];pStep=0;$('predA').textContent='—';$('predB').textContent='—';$('normP').textContent='—';$('pLog').textContent='选择动作与观测后，点击“执行一步更新”。';pRender();};
+pRender();
+
+/* 演示 5：问诊贝叶斯更新 */
+const DOC={b:[0.5,0.5],n:0,lik:{fever:[0.8,0.2],sneeze:[0.4,0.9]},names:['感冒','过敏']};
+function docUpdate(key){
+  const lik=DOC.lik[key];
+  const w=DOC.b.map((v,i)=>v*lik[i]);const norm=w.reduce((a,c)=>a+c,0);
+  DOC.b=w.map(v=>v/norm);DOC.n++;docRender();
+}
+function docRender(){
+  $('docN').textContent=DOC.n;
+  for(let i=0;i<2;i++){$(`docBar${i}`).style.width=(DOC.b[i]*100).toFixed(1)+'%';$(`docVal${i}`).textContent=DOC.b[i].toFixed(3);}
+  const top=DOC.b[0]>=DOC.b[1]?DOC.names[0]:DOC.names[1];
+  $('docLog').innerHTML=`当前信念：感冒 ${DOC.b[0].toFixed(3)}，过敏 ${DOC.b[1].toFixed(3)}；当前更倾向 <b>${top}</b>。证据越多，信念越向似然更高的疾病集中。`;
+}
+$('docFever').onclick=()=>docUpdate('fever');
+$('docSneeze').onclick=()=>docUpdate('sneeze');
+$('docReset').onclick=()=>{DOC.b=[0.5,0.5];DOC.n=0;docRender();};
+docRender();
+
+/* 演示 6：对话意图跟踪 */
+const UT={b:[1/3,1/3,1/3],n:0,liks:[[0.7,0.1,0.2],[0.1,0.8,0.1],[0.2,0.1,0.7]],names:['订票','退票','查询'],kws:['机票','退','几点']};
+function utUpdate(i){
+  const lik=UT.liks[i];
+  const w=UT.b.map((v,k)=>v*lik[k]);const norm=w.reduce((a,c)=>a+c,0);
+  UT.b=w.map(v=>v/norm);UT.n++;utRender();
+}
+function utRender(){
+  $('utN').textContent=UT.n;
+  const cols=['#4a90d9','#c0392b','#d99a4a'];
+  let top=0;for(let k=1;k<3;k++)if(UT.b[k]>UT.b[top])top=k;
+  for(let k=0;k<3;k++){$(`utBar${k}`).style.width=(UT.b[k]*100).toFixed(1)+'%';$(`utBar${k}`).style.background=cols[k];$(`utVal${k}`).textContent=UT.b[k].toFixed(3);}
+  $('utLog').innerHTML=`当前意图信念：订票 ${UT.b[0].toFixed(3)}，退票 ${UT.b[1].toFixed(3)}，查询 ${UT.b[2].toFixed(3)}；最可能意图为 <b>${UT.names[top]}</b>。信念分散时系统应主动追问。`;
+}
+$('utKw0').onclick=()=>utUpdate(0);
+$('utKw1').onclick=()=>utUpdate(1);
+$('utKw2').onclick=()=>utUpdate(2);
+$('utReset').onclick=()=>{UT.b=[1/3,1/3,1/3];UT.n=0;utRender();};
+utRender();
+</script>
+</body>
+</html>

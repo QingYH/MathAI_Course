@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第二讲 · MDP 与动态规划 | 人工智能的数学方法</title>
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@600;700&display=swap">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://fastly.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+  :root{
+    --bg:#f5f9fc; --card:#ffffff; --ink:#1e2f3d; --sub:#51647a;
+    --primary:#2563a8; --primary-soft:#e6f0f9; --accent:#2c8a8a; --accent-soft:#e4f3f2;
+    --hl:#fff2bf; --hl-ink:#8a5a00; --line:#dbe7f0;
+    --shadow:0 6px 22px rgba(37,99,168,.10); --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:"Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.85;-webkit-text-size-adjust:100%;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 18px;}
+  header.hero{background:linear-gradient(135deg,#2563a8 0%,#2c8a8a 100%);color:#fff;padding:46px 0 38px;}
+  header.hero .kicker{font-size:15px;letter-spacing:3px;opacity:.85;margin-bottom:10px;}
+  header.hero h1{font-size:clamp(26px,4.5vw,38px);font-weight:900;letter-spacing:1px;}
+  header.hero p{margin-top:12px;font-size:clamp(15px,2.2vw,18px);opacity:.92;max-width:760px;}
+  .back-home{display:inline-flex;align-items:center;gap:8px;margin-top:20px;text-decoration:none;color:#fff;border:1px solid rgba(255,255,255,.5);padding:9px 18px;border-radius:999px;font-size:15px;}
+  .back-home:hover{background:rgba(255,255,255,.12);}
+  nav.toc{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;}
+  nav.toc .wrap{display:flex;gap:6px;padding-top:10px;padding-bottom:10px;}
+  nav.toc a{display:inline-block;color:var(--primary);text-decoration:none;font-size:15px;padding:7px 13px;border-radius:20px;flex:0 0 auto;}
+  nav.toc a:hover{background:var(--primary-soft);}
+  section{padding:38px 0 8px;}
+  h2{font-size:clamp(22px,3.2vw,28px);font-weight:900;color:var(--primary);margin-bottom:16px;padding-left:14px;border-left:5px solid var(--accent);}
+  h3{font-size:19px;font-weight:700;color:var(--ink);margin:22px 0 10px;}
+  p{margin:10px 0;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin:18px 0;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px;}
+  .hl{background:var(--hl);color:var(--hl-ink);font-weight:700;padding:1px 6px;border-radius:5px;}
+  .term{color:var(--primary);font-weight:700;}
+  .note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:16px;}
+  .formula{background:#fbfdff;border:1px dashed var(--line);border-radius:12px;padding:14px 16px;margin:14px 0;overflow-x:auto;}
+  ul,ol{padding-left:24px;margin:10px 0;}
+  li{margin:7px 0;}
+  code{background:var(--primary-soft);color:var(--primary);padding:1px 6px;border-radius:5px;font-size:15px;font-family:"SFMono-Regular",Consolas,Menlo,monospace;}
+  pre{background:#1f3346;color:#eaf3fb;border-radius:12px;padding:16px;overflow-x:auto;font-size:14.5px;line-height:1.7;margin:12px 0;font-family:"SFMono-Regular",Consolas,Menlo,monospace;}
+  pre code{background:transparent;color:inherit;padding:0;}
+  table.data{border-collapse:collapse;width:100%;margin:12px 0;font-size:15.5px;}
+  table.data th,table.data td{border:1px solid var(--line);padding:9px 12px;text-align:left;}
+  table.data th{background:var(--primary-soft);color:var(--primary);}
+  .demo-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:14px;}
+  .demo-head h3{margin:0;}
+  .badge{display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:700;padding:3px 10px;border-radius:12px;}
+  button.btn{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;}
+  button.btn.secondary{background:var(--accent);}
+  button.btn.ghost{background:#fff;color:var(--primary);border:1px solid var(--primary);}
+  button.btn:active{transform:scale(.97);}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0;}
+  .stat{font-size:16px;color:var(--sub);}
+  .stat b{color:var(--ink);}
+  .gridworld{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:420px;margin:0 auto;}
+  .cell{aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:15px;gap:2px;border:1px solid var(--line);background:#f2f7fb;}
+  .cell .v{font-weight:700;font-variant-numeric:tabular-nums;}
+  .cell .arrow{font-size:18px;}
+  .cell.goal{background:#d8f3dc;border-color:#95d5a8;}
+  .cell.pit{background:#fde2e2;border-color:#f3a6a6;}
+  .cell.obstacle{background:#c9d4de;}
+  input.inp{font-family:inherit;font-size:16px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;}
+  .gen-output{min-height:60px;background:#fbfdff;border:1px solid var(--line);border-radius:12px;padding:14px;font-size:17px;line-height:1.9;}
+  button.btn.sel{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px;margin-top:14px;}
+  .kv .box{background:#f6f8f7;border-radius:12px;padding:16px;}
+  .kv .box b{display:block;color:var(--primary);margin-bottom:4px;}
+  details{margin:14px 0;border:1px solid var(--line);border-radius:12px;background:#fbfdff;}
+  summary{cursor:pointer;padding:12px 16px;font-weight:700;color:var(--accent);list-style:none;}
+  summary::before{content:"▸ ";}
+  details[open] summary::before{content:"▾ ";}
+  details[open] summary{border-bottom:1px solid var(--line);}
+  details .solution{padding:12px 16px;}
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .65s ease,transform .65s ease;}
+  .reveal.visible{opacity:1;transform:none;}
+  footer{padding:30px 0 50px;color:var(--sub);font-size:14px;text-align:center;}
+  @media (max-width:640px){
+    body{font-size:16px;}
+    .card{padding:16px;}
+    header.hero{padding:34px 0 28px;}
+    table.data{font-size:14px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">硕士生课程 · 人工智能的数学方法 · 第二讲</div>
+    <h1>马尔可夫决策过程（MDP）与动态规划</h1>
+    <p>在第一讲随机过程的基础上引入动作与奖励，把决策问题形式化为 MDP；建立价值函数与贝尔曼方程，并在环境模型已知的前提下，用策略迭代与值迭代等动态规划方法求解最优策略。</p>
+    <a class="back-home" href="人工智能数学方法.html">← 返回课程首页</a>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#sec-intro">课程导入</a>
+    <a href="#sec-symbols">符号说明</a>
+    <a href="#sec-math">数学原理</a>
+    <a href="#sec-cases">经典案例</a>
+    <a href="#sec-algo">核心算法</a>
+    <a href="#sec-demo1">演示·回报计算</a>
+    <a href="#sec-demo2">演示·值迭代</a>
+    <a href="#sec-demo3">例子·动作比较</a>
+    <a href="#sec-demo4">应用·库存管理</a>
+    <a href="#sec-ai">AI 应用</a>
+    <a href="#sec-exercise">课堂练习</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- 1. 导入 -->
+<section id="sec-intro">
+  <h2 class="reveal">一、课程导入：从“状态演化”到“主动决策”</h2>
+  <div class="card reveal">
+    <h3>例子 1：机器人在网格中选择走哪一格</h3>
+    <p>第一讲的马尔科夫链中，状态是被动演化的。现在机器人可以<strong>主动选择动作</strong>：向上、下、左、右移动。不同动作导致不同的后继状态分布，也带来不同奖励（靠近目标得正奖励，撞入陷阱得负奖励）。决策的目标是：选择一套动作规则，使长期累积奖励最大。</p>
+  </div>
+  <div class="card reveal">
+    <h3>例子 2：棋类中选择一步棋</h3>
+    <p>棋局是状态，落子是动作，胜负与局面优势是奖励。棋手（或 AI）需要评估“在当前局面下，每种走法长期来看价值多大”，再选择价值最高的走法。这正是 MDP 中价值函数与最优策略要回答的问题。</p>
+    <div class="note">与马尔科夫链的区别：MDP 在状态转移之外增加了<span class="hl">动作</span>与<span class="hl">奖励</span>，转移概率写成 $P(s'\mid s,a)$——下一状态不仅依赖当前状态，还依赖所选动作。</div>
+  </div>
+</section>
+
+<!-- 2. 符号 -->
+<section id="sec-symbols">
+  <h2 class="reveal">二、符号说明（先读这张表）</h2>
+  <div class="card reveal">
+    <table class="data">
+      <tr><th>符号</th><th>中文含义</th><th>英文 / 说明</th></tr>
+      <tr><td>$\mathcal{S}$</td><td>状态集合</td><td>state space</td></tr>
+      <tr><td>$\mathcal{A}$</td><td>动作集合</td><td>action space</td></tr>
+      <tr><td>$P(s'\mid s,a)$</td><td>在 $s$ 执行 $a$ 转移到 $s'$ 的概率</td><td>transition probability</td></tr>
+      <tr><td>$R(s,a)$</td><td>状态–动作对的期望即时奖励</td><td>reward function</td></tr>
+      <tr><td>$\gamma$</td><td>折扣因子，$0\le\gamma<1$</td><td>discount factor</td></tr>
+      <tr><td>$\pi(a\mid s)$</td><td>策略：状态 $s$ 下选动作 $a$ 的概率</td><td>policy</td></tr>
+      <tr><td>$G_t$</td><td>从时刻 $t$ 起的折扣回报</td><td>return</td></tr>
+      <tr><td>$V^{\pi}(s)$</td><td>状态价值函数（遵循 $\pi$ 的期望回报）</td><td>state value function</td></tr>
+      <tr><td>$Q^{\pi}(s,a)$</td><td>动作价值函数</td><td>action value function</td></tr>
+      <tr><td>$V^{*},Q^{*}$</td><td>最优状态 / 动作价值</td><td>optimal value</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- 3. 数学原理 -->
+<section id="sec-math">
+  <h2 class="reveal">三、数学原理</h2>
+
+  <div class="card reveal">
+    <h3>3.1 MDP 五元组</h3>
+    <p>一个有限马尔可夫决策过程由五元组描述：</p>
+    <div class="formula">$$\mathcal{M}=\langle \mathcal{S},\ \mathcal{A},\ P(s'\mid s,a),\ R(s,a),\ \gamma\rangle$$</div>
+    <ul>
+      <li>$P(s'\mid s,a)=\Pr(S_{t+1}=s'\mid S_t=s,A_t=a)$：受控状态转移；</li>
+      <li>$R(s,a)=\mathbb{E}[R_{t+1}\mid S_t=s,A_t=a]$：即时奖励；</li>
+      <li>$\gamma\in[0,1]$：折扣因子，权衡长期与短期收益。</li>
+    </ul>
+  </div>
+
+  <div class="card reveal">
+    <h3>3.2 策略与折扣回报</h3>
+    <p><span class="hl">策略</span> $\pi(a\mid s)$ 是状态到动作概率分布的映射：</p>
+    <div class="formula">$$\pi(a\mid s)=\Pr(A_t=a\mid S_t=s),\qquad \sum_{a\in\mathcal{A}}\pi(a\mid s)=1$$</div>
+    <p>从时刻 $t$ 出发的折扣回报为：</p>
+    <div class="formula">$$G_t=R_{t+1}+\gamma R_{t+2}+\gamma^{2}R_{t+3}+\cdots=\sum_{k=0}^{\infty}\gamma^{k}R_{t+k+1}$$</div>
+  </div>
+
+  <div class="card reveal">
+    <h3>3.3 价值函数与贝尔曼期望方程</h3>
+    <p>状态价值与动作价值定义为：</p>
+    <div class="formula">$$V^{\pi}(s)=\mathbb{E}_{\pi}[G_t\mid S_t=s],\qquad Q^{\pi}(s,a)=\mathbb{E}_{\pi}[G_t\mid S_t=s,A_t=a]$$</div>
+    <p>价值可按后继状态递归分解，得到<span class="hl">贝尔曼期望方程</span>：</p>
+    <div class="formula">$$V^{\pi}(s)=\sum_a\pi(a\mid s)\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^{\pi}(s')\right]$$</div>
+    <div class="formula">$$Q^{\pi}(s,a)=R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^{\pi}(s')$$</div>
+  </div>
+
+  <div class="card reveal">
+    <h3>3.4 贝尔曼最优方程</h3>
+    <p>对每个状态取动作上确界，得到最优价值满足的<span class="hl-t">贝尔曼最优方程</span>：</p>
+    <div class="formula">$$V^{*}(s)=\max_{a\in\mathcal{A}}\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^{*}(s')\right]$$</div>
+    <div class="formula">$$Q^{*}(s,a)=R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V^{*}(s'),\qquad \pi^{*}(s)=\arg\max_a Q^{*}(s,a)$$</div>
+    <div class="note">期望方程对应某一给定策略 $\pi$，是线性方程；最优方程含 $\max$ 算子，是非线性方程，需迭代逼近。</div>
+  </div>
+
+  <div class="card reveal">
+    <h3>3.5 收敛性：压缩映射（γ-收缩）</h3>
+    <p>定义贝尔曼最优算子 $\mathcal{T}$：</p>
+    <div class="formula">$$(\mathcal{T}V)(s)=\max_a\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V(s')\right]$$</div>
+    <p>当 $\gamma<1$ 时，$\mathcal{T}$ 关于无穷范数是 $\gamma$-压缩映射：</p>
+    <div class="formula">$$\|\mathcal{T}V-\mathcal{T}V'\|_{\infty}\le\gamma\,\|V-V'\|_{\infty}$$</div>
+    <p>由<span class="hl">压缩映射定理（巴拿赫不动点定理）</span>，迭代 $V_{k+1}=\mathcal{T}V_k$ 必收敛到唯一不动点 $V^{*}$，并有误差界：</p>
+    <div class="formula">$$\|V_k-V^{*}\|_{\infty}\le\frac{\gamma^{k}}{1-\gamma}\|V_1-V_0\|_{\infty}$$</div>
+  </div>
+</section>
+
+<!-- 4. 经典案例 -->
+<section id="sec-cases">
+  <h2 class="reveal">四、四个经典建模案例</h2>
+  <div class="grid">
+    <div class="card reveal"><h3>案例 1：栅格导航</h3><p>状态为机器人栅格位置，动作为四向移动，目标得正奖励、陷阱得负奖励，求到达目标的最短最优路径。</p></div>
+    <div class="card reveal"><h3>案例 2：棋类与游戏 AI</h3><p>局面为状态，合法走法为动作，胜负与局面评分为奖励，价值函数估计每种走法的长期优劣。</p></div>
+    <div class="card reveal"><h3>案例 3：库存管理</h3><p>库存水平为状态，补货量为动作，持有成本与缺货惩罚构成奖励，求长期成本最小的订货策略。</p></div>
+    <div class="card reveal"><h3>案例 4：调度与排队</h3><p>队列负载为状态，派单 / 调度为动作，服务水平与等待成本为奖励，建模为 MDP 求最优调度规则。</p></div>
+  </div>
+</section>
+
+<!-- 5. 核心算法 -->
+<section id="sec-algo">
+  <h2 class="reveal">五、具体算法（模型已知下的动态规划）</h2>
+  <div class="grid">
+    <div class="card reveal">
+      <h3>算法 1：策略评估</h3>
+      <p>给定策略 $\pi$，按贝尔曼期望方程迭代求解 $V^{\pi}$：</p>
+      <div class="formula">$$V_{k+1}(s)=\sum_a\pi(a\mid s)\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V_k(s')\right]$$</div>
+      <p>直至 $\max_s|V_{k+1}(s)-V_k(s)|<\theta$。</p>
+    </div>
+    <div class="card reveal">
+      <h3>算法 2：策略改进</h3>
+      <p>依据当前价值对每个状态取贪心动作，构造更优策略：</p>
+      <div class="formula">$$\pi'(s)=\arg\max_a Q^{\pi}(s,a)$$</div>
+      <p>若 $\pi'=\pi$，策略已最优；否则返回评估步骤。</p>
+    </div>
+    <div class="card reveal">
+      <h3>算法 3：策略迭代</h3>
+      <ol>
+        <li>初始化策略 $\pi_0$；</li>
+        <li>策略评估求得 $V^{\pi_k}$；</li>
+        <li>策略改进得到 $\pi_{k+1}$；</li>
+        <li>策略稳定则停止，否则返回第 2 步。</li>
+      </ol>
+    </div>
+    <div class="card reveal">
+      <h3>算法 4：值迭代</h3>
+      <p>把改进中的 $\max$ 并入价值更新，省略显式策略：</p>
+      <div class="formula">$$V_{k+1}(s)=\max_a\left[R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V_k(s')\right]$$</div>
+      <p>收敛后由 $V^{*}$ 导出最优策略 $\pi^{*}$。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6. 演示 1：回报计算器 -->
+<section id="sec-demo1">
+  <h2 class="reveal">六、交互演示 1：折扣回报计算器</h2>
+  <div class="card reveal">
+    <div class="demo-head"><span class="badge">$G_t=\sum \gamma^k R$</span><h3>输入奖励序列与 γ，计算折扣回报</h3></div>
+    <p>输入一串即时奖励（按时间顺序，逗号分隔）与折扣因子 $\gamma$，观察逐期权重与总回报 $G_t$。$\gamma$ 越接近 1 越重视远期奖励。</p>
+    <div class="controls">
+      <input class="inp" id="rewSeq" style="min-width:220px;" value="1,0,2,-1,3">
+      <label class="stat">γ = <input class="inp" id="gammaIn" type="number" step="0.05" min="0" max="1" value="0.9" style="width:90px;"></label>
+      <button class="btn" id="btnCalc">计算回报</button>
+    </div>
+    <div class="gen-output" id="returnOut">点击“计算回报”查看结果。</div>
+  </div>
+</section>
+
+<!-- 7. 演示 2：值迭代 -->
+<section id="sec-demo2">
+  <h2 class="reveal">七、交互演示 2：网格世界 · 值迭代</h2>
+  <div class="card reveal">
+    <div class="demo-head"><span class="badge">贝尔曼最优方程</span><h3>4×4 网格中的最优价值与策略</h3></div>
+    <p>智能体目标是右上角绿色目标（$+1$），避开红色陷阱（$-1$）与灰色障碍。每移动一步奖励 $-0.04$，$\gamma=0.9$。点击“值迭代一步”，观察各状态价值 $V(s)$ 与贪心策略箭头如何收敛。</p>
+    <div class="controls">
+      <button class="btn" id="viStep">值迭代一步</button>
+      <button class="btn secondary" id="viAuto">自动迭代</button>
+      <button class="btn ghost" id="viReset">重置</button>
+      <span class="stat">迭代轮数：<b id="viIter">0</b></span>
+    </div>
+    <div class="gridworld" id="gridworld"></div>
+    <div class="note">价值 $V(s)$ 表示从该状态出发遵循最优策略的期望折扣回报；箭头指向使贝尔曼更新最大的动作。这是马尔科夫转移结构在强化学习中的直接应用。</div>
+  </div>
+</section>
+
+<!-- 8. 演示 3：概念例子 · 动作比较 -->
+<section id="sec-demo3">
+  <h2 class="reveal">八、易理解的交互例子：同一个状态，两个动作哪个更优？</h2>
+  <div class="card reveal">
+    <div class="demo-head"><span class="badge">$Q(s,a)=R+\gamma\sum P V$</span><h3>把一次贝尔曼备份拆开看</h3></div>
+    <p>当前状态 $s$ 有两个动作可选。环境是随机的：动作可能把我们带到不同后继状态，每个后继状态已有一个估计价值 $V(s')$。动作价值按 $Q(s,a)=R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V(s')$ 计算。先调折扣因子 $\gamma$，再点两个动作按钮，对比它们的期望后继价值与总分。</p>
+    <table class="data">
+      <tr><th>动作</th><th>即时奖励 $R$</th><th>后继转移与价值</th></tr>
+      <tr><td>$a_1$</td><td>+1.0</td><td>0.7 → $s_A$（$V=3$）；0.3 → $s_B$（$V=1$）</td></tr>
+      <tr><td>$a_2$</td><td>+2.0</td><td>0.5 → $s_A$（$V=3$）；0.5 → $s_C$（$V=0$）</td></tr>
+    </table>
+    <div class="controls">
+      <label class="stat">γ = <input class="inp" id="cmpGamma" type="number" step="0.05" min="0" max="1" value="0.9" style="width:90px;"></label>
+      <button class="btn" id="cmpA1">计算 $Q(s,a_1)$</button>
+      <button class="btn secondary" id="cmpA2">计算 $Q(s,a_2)$</button>
+      <button class="btn ghost" id="cmpReset">清空比较</button>
+    </div>
+    <div class="gen-output" id="cmpOut">点击动作按钮，查看该动作的奖励、期望后继价值与 $Q$ 值。</div>
+    <div class="note" id="cmpBest" style="display:none;"></div>
+  </div>
+</section>
+
+<!-- 9. 演示 4：应用案例 · 库存管理 -->
+<section id="sec-demo4">
+  <h2 class="reveal">九、可交互的应用案例：小商店补货决策模拟</h2>
+  <div class="card reveal">
+    <div class="demo-head"><span class="badge">MDP 库存模型</span><h3>不同补货策略下的长期成本对比</h3></div>
+    <p>库存水平是状态，每日补货量是动作；当日需求随机为 0、1、2（概率 0.3、0.5、0.2）。每天结束按剩余库存付持有成本 0.1 / 件，缺货每件罚 1.0。选择一种补货策略，逐日推进观察库存与累计成本，比较哪种策略长期更省。</p>
+    <div class="controls">
+      <button class="btn sel" id="invP0">策略：不补货</button>
+      <button class="btn secondary" id="invP1">策略：每日补 1 件</button>
+      <button class="btn secondary" id="invP3">策略：补到 3 件</button>
+      <button class="btn" id="invDay">模拟一天</button>
+      <button class="btn secondary" id="inv30">模拟 30 天</button>
+      <button class="btn ghost" id="invReset">重置</button>
+    </div>
+    <div class="kv">
+      <div class="box"><b>当前库存</b><span id="invStock">2</span></div>
+      <div class="box"><b>当日需求</b><span id="invDemand">—</span></div>
+      <div class="box"><b>当日成本</b><span id="invCost">0.00</span></div>
+      <div class="box"><b>累计成本</b><span id="invTotal">0.00</span></div>
+      <div class="box"><b>天数</b><span id="invDays">0</span></div>
+      <div class="box"><b>累计缺货件数</b><span id="invShort">0</span></div>
+    </div>
+    <div class="note">库存 MDP 的状态是库存水平，动作是补货量；最优补货策略正是通过策略迭代 / 值迭代，在“多备货压资金”与“缺货丢订单”之间取得长期成本最小的平衡。</div>
+  </div>
+</section>
+
+<!-- 10. AI 应用 -->
+<section id="sec-ai">
+  <h2 class="reveal">八、MDP 与动态规划在人工智能中的应用</h2>
+  <div class="grid">
+    <div class="card reveal">
+      <h3>8.1 机器人导航与控制</h3>
+      <p>把机器人位姿、任务进度建模为状态，移动 / 操作为动作，碰撞与目标达成为奖励。模型已知时可用值迭代 / 策略迭代求出最优导航策略，上层对接感知与定位模块。</p>
+    </div>
+    <div class="card reveal">
+      <h3>8.2 博弈与游戏 AI</h3>
+      <p>在状态转移可建模的棋类与决策游戏中，动态规划思想用于局面价值评估与最优动作选择，与极小化极大搜索、剪枝结合，构成早期游戏 AI 的决策核心。</p>
+    </div>
+    <div class="card reveal">
+      <h3>8.3 库存与资源调度</h3>
+      <p>库存、能源、交通调度等序贯决策问题建模为 MDP，状态为库存 / 负载水平，动作为补货 / 派单，用策略迭代或值迭代求长期成本最小的决策规则。</p>
+    </div>
+    <div class="card reveal">
+      <h3>8.4 作为后续算法的基准</h3>
+      <p>动态规划要求已知完整模型；当模型未知时，第三讲的无模型方法（Q-learning）以样本期望替代模型求和，其收敛性仍以贝尔曼最优算子的压缩性为理论基础。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9. 练习 -->
+<section id="sec-exercise">
+  <h2 class="reveal">九、课堂练习（含详解）</h2>
+  <div class="card reveal">
+    <p>练习 1–3、5–6 为课堂手算 / 推导，练习 4、7 可在 30 分钟内用 Python 完成。每道题都附有可折叠的详细解答过程。</p>
+
+    <h3>练习 1：期望即时奖励（手算）</h3>
+    <p>状态 $s$ 执行动作 $a$：以 0.6 概率转移到 $s_1$（奖励 $+1$），以 0.4 概率转移到 $s_2$（奖励 $-1$）。求 $R(s,a)$。</p>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p>$$R(s,a)=0.6\times1+0.4\times(-1)=0.2$$</p>
+    </div></details>
+
+    <h3>练习 2：折扣回报（手算）</h3>
+    <p>奖励序列 $R_{t+1}=2,\ R_{t+2}=0,\ R_{t+3}=4$，$\gamma=0.5$，计算 $G_t$。</p>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p>$$G_t=2+0.5\times0+0.5^{2}\times4=2+1=3$$</p>
+    </div></details>
+
+    <h3>练习 3：两状态贝尔曼方程（推导）</h3>
+    <p>两状态 $s_1,s_2$，$\gamma=0.8$，策略下 $R(s_1)=2,\ R(s_2)=1$，$P(s_2\mid s_1)=1,\ P(s_1\mid s_2)=1$。写出 $V^{\pi}$ 的方程并求解。</p>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p>$$V(s_1)=2+\gamma V(s_2),\qquad V(s_2)=1+\gamma V(s_1)$$</p>
+      <p>代入 $\gamma=0.8$：$V(s_1)=2+0.8(1+0.8V(s_1))$，解得 $V(s_1)\approx7.78$，$V(s_2)\approx7.22$。</p>
+    </div></details>
+
+    <h3>练习 4：小型网格世界值迭代（挑战 · 编程）</h3>
+    <p>自行实现 4×4 网格世界：定义障碍、目标与奖励，按贝尔曼最优方程迭代更新 $V(s)$，直到 $\max_s|V_{k+1}(s)-V_k(s)|<10^{-3}$，并提取贪心策略，可对照演示 2 校验。</p>
+<pre><code>def value_iteration(S, A, P, R, gamma=0.9, theta=1e-3):
+    V = {s: 0.0 for s in S}
+    while True:
+        delta = 0
+        for s in S:
+            v = V[s]
+            V[s] = max(R(s, a) + gamma * sum(P(s2 | s, a) * V[s2] for s2 in S)
+                       for a in A(s))
+            delta = max(delta, abs(v - V[s]))
+        if delta < theta:
+            break
+    pi = {s: max(A(s), key=lambda a: R(s, a) + gamma * sum(P(s2 | s, a) * V[s2] for s2 in S))
+          for s in S}
+    return V, pi</code></pre>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p>每轮对所有非终止状态执行贝尔曼最优更新。收敛后目标格价值最高、陷阱附近为负，贪心箭头一致指向目标方向。以演示 2 参数（$\gamma=0.9$，步长奖励 $-0.04$）运行约 20–30 轮收敛，可用相邻两轮价值最大差作为停机判据。</p>
+    </div></details>
+
+    <h3>练习 5：手算动作价值并选最优动作（手算题）</h3>
+    <p>沿用演示 3 的设定：$\gamma=0.9$。动作 $a_1$：$R=1$，以 0.7 到 $s_A$（$V=3$）、0.3 到 $s_B$（$V=1$）；动作 $a_2$：$R=2$，以 0.5 到 $s_A$（$V=3$）、0.5 到 $s_C$（$V=0$）。分别计算 $Q(s,a_1)$、$Q(s,a_2)$，并指出贪心策略应选哪个动作。</p>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p><strong>动作 $a_1$：</strong>期望后继价值 $=0.7\times3+0.3\times1=2.40$；</p>
+      <p>$$Q(s,a_1)=1+0.9\times2.40=1+2.16=3.16$$</p>
+      <p><strong>动作 $a_2$：</strong>期望后继价值 $=0.5\times3+0.5\times0=1.50$；</p>
+      <p>$$Q(s,a_2)=2+0.9\times1.50=2+1.35=3.35$$</p>
+      <p>比较 $3.35>3.16$，故贪心策略 $\pi^{*}(s)=\arg\max_a Q(s,a)$ 应选择 <span class="term">$a_2$</span>。注意 $a_2$ 虽然后继期望价值更低，但即时奖励更高，在当前 $\gamma$ 下总分仍占优；若调小 $\gamma$，长期价值被压缩，结论可能改变，可在演示 3 中拖动 $\gamma$ 验证。</p>
+    </div></details>
+
+    <h3>练习 6：策略评估的一轮迭代（手算题）</h3>
+    <p>两状态 $s_1,s_2$，$\gamma=0.8$。固定策略下：$R(s_1)=2,\ R(s_2)=1$；$P(s_2\mid s_1)=1,\ P(s_1\mid s_2)=1$。上一轮价值估计 $V_k(s_1)=0,\ V_k(s_2)=0$。按贝尔曼期望方程计算一轮更新后的 $V_{k+1}(s_1),V_{k+1}(s_2)$，并再迭代一轮观察数值变化。</p>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p>贝尔曼期望更新：$V_{k+1}(s)=R(s)+\gamma\sum_{s'}P(s'\mid s)V_k(s')$。</p>
+      <p><strong>第一轮（$V_k=0$）：</strong></p>
+      <p>$$V_{k+1}(s_1)=2+0.8\times V_k(s_2)=2+0=2.00$$</p>
+      <p>$$V_{k+1}(s_2)=1+0.8\times V_k(s_1)=1+0=1.00$$</p>
+      <p><strong>第二轮（用上一步结果）：</strong></p>
+      <p>$$V_{k+2}(s_1)=2+0.8\times1.00=2.80$$</p>
+      <p>$$V_{k+2}(s_2)=1+0.8\times2.00=2.60$$</p>
+      <p>继续迭代将收敛到练习 3 的解析解 $V(s_1)\approx7.78,\ V(s_2)\approx7.22$。每一轮都把后继状态的价值按 $\gamma$ 折现并叠加即时奖励，这正是策略评估的备份过程。</p>
+    </div></details>
+
+    <h3>练习 7：库存策略的成本权衡（概念 + 编程）</h3>
+    <p>在演示 4 的库存模型中，分别实现“不补货”“每日补 1 件”“补到 3 件”三种策略，各模拟 1000 天，统计平均每日成本、平均缺货件数与平均库存，说明三者的成本结构差异，并猜测最优策略大致处于什么区间。</p>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p><strong>不补货：</strong>库存很快耗尽，缺货惩罚占主导，长期成本高；<strong>补到 3 件：</strong>缺货最少，但期末库存高，持有成本上升；<strong>每日补 1 件：</strong>在两者之间。需求期望为 $0.3\times0+0.5\times1+0.2\times2=0.9$ 件/天，因此长期补货量需接近期望需求才能平衡缺货与持有。最优订货点 / 订货量应由 MDP 求解得到，通常是一个“库存低于阈值就补货”的阈值策略，而不是固定每天补同样数量。</p>
+    </div></details>
+
+    <div class="note">思考题：策略迭代每轮要做完整策略评估，值迭代把评估与改进合并。在状态空间很大时，为什么值迭代往往更易实现？两者各自的收敛代价如何？</div>
+  </div>
+</section>
+
+</main>
+
+<footer><div class="wrap">硕士生课程《人工智能的数学方法》· 第二讲 MDP 与动态规划 · 公式由 MathJax 渲染</div></footer>
+
+<script>
+const $ = id => document.getElementById(id);
+
+/* 滚动渐显 */
+const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* 演示 1：折扣回报计算器 */
+$('btnCalc').onclick=()=>{
+  const seq=$('rewSeq').value.split(',').map(x=>parseFloat(x.trim())).filter(x=>!isNaN(x));
+  const gamma=parseFloat($('gammaIn').value);
+  const out=$('returnOut');
+  if(seq.length===0||isNaN(gamma)){out.textContent='请输入有效奖励序列与 γ。';return;}
+  let G=0,terms=[];
+  seq.forEach((r,k)=>{const w=Math.pow(gamma,k);G+=w*r;terms.push(`${w.toFixed(3)}×(${r})`);});
+  out.innerHTML=`$$G_t = ${terms.join(' + ')} = \\mathbf{${G.toFixed(3)}}$$<br>共 ${seq.length} 期，γ = ${gamma}。`;
+  if(window.MathJax)MathJax.typeset([out]);
+};
+
+/* 演示 2：网格世界值迭代 */
+const GW={size:4,gamma:0.9,stepCost:-0.04,iter:0,goal:[0,3],pit:[2,1],obstacle:[1,2],V:[],policy:[]};
+function gwInit(){
+  GW.V=Array.from({length:GW.size},()=>new Array(GW.size).fill(0));
+  GW.policy=Array.from({length:GW.size},()=>new Array(GW.size).fill(''));
+  GW.iter=0;
+}
+function gwTerminal(r,c){
+  return (r===GW.goal[0]&&c===GW.goal[1])||(r===GW.pit[0]&&c===GW.pit[1])||(r===GW.obstacle[0]&&c===GW.obstacle[1]);
+}
+const DIRS=[[-1,0,'↑'],[1,0,'↓'],[0,-1,'←'],[0,1,'→']];
+function gwStep(){
+  const newV=GW.V.map(row=>row.slice());
+  for(let r=0;r<GW.size;r++)for(let c=0;c<GW.size;c++){
+    if(gwTerminal(r,c))continue;
+    let best=-Infinity,bestAct='';
+    for(const[dr,dc,arw]of DIRS){
+      let nr=r+dr,nc=c+dc;
+      if(nr<0||nr>=GW.size||nc<0||nc>=GW.size||(nr===GW.obstacle[0]&&nc===GW.obstacle[1])){nr=r;nc=c;}
+      let reward=GW.stepCost;
+      if(nr===GW.goal[0]&&nc===GW.goal[1])reward=1;
+      if(nr===GW.pit[0]&&nc===GW.pit[1])reward=-1;
+      const val=reward+GW.gamma*GW.V[nr][nc];
+      if(val>best){best=val;bestAct=arw;}
+    }
+    newV[r][c]=best;GW.policy[r][c]=bestAct;
+  }
+  GW.V=newV;GW.iter++;gwRender();
+}
+function gwRender(){
+  const el=$('gridworld');el.innerHTML='';
+  for(let r=0;r<GW.size;r++)for(let c=0;c<GW.size;c++){
+    const div=document.createElement('div');div.className='cell';
+    let label='',v=GW.V[r][c].toFixed(2);
+    if(r===GW.goal[0]&&c===GW.goal[1]){div.classList.add('goal');label='目标';v='+1.00';}
+    else if(r===GW.pit[0]&&c===GW.pit[1]){div.classList.add('pit');label='陷阱';v='−1.00';}
+    else if(r===GW.obstacle[0]&&c===GW.obstacle[1]){div.classList.add('obstacle');label='障碍';v='—';}
+    div.innerHTML=`<span class="arrow">${GW.policy[r][c]||''}</span><span class="v">${v}</span><span style="font-size:12px;color:#51647a">${label}</span>`;
+    el.appendChild(div);
+  }
+  $('viIter').textContent=GW.iter;
+}
+let gwTimer=null;
+$('viStep').onclick=gwStep;
+$('viAuto').onclick=()=>{
+  if(gwTimer){clearInterval(gwTimer);gwTimer=null;$('viAuto').textContent='自动迭代';return;}
+  $('viAuto').textContent='暂停';
+  gwTimer=setInterval(()=>{if(GW.iter>=30){clearInterval(gwTimer);gwTimer=null;$('viAuto').textContent='自动迭代';return;}gwStep();},250);
+};
+$('viReset').onclick=()=>{clearInterval(gwTimer);gwTimer=null;$('viAuto').textContent='自动迭代';gwInit();gwRender();};
+gwInit();gwRender();
+
+/* 演示 3：动作价值比较 */
+const CMP={
+  a1:{R:1.0,trans:[[0.7,3],[0.3,1]],name:'$a_1$'},
+  a2:{R:2.0,trans:[[0.5,3],[0.5,0]],name:'$a_2$'},
+  q:{a1:null,a2:null}
+};
+function cmpCalc(key){
+  const gamma=parseFloat($('cmpGamma').value)||0.9;
+  const d=CMP[key];
+  const exp=d.trans.reduce((s,[p,v])=>s+p*v,0);
+  const q=d.R+gamma*exp;
+  CMP.q[key]=q;
+  const terms=d.trans.map(([p,v])=>`${p}\\times ${v}`).join('+');
+  $('cmpOut').innerHTML=`动作 ${d.name}：$Q=${d.R}+${gamma}\\times(${terms})=${d.R}+${gamma}\\times${exp.toFixed(2)}=\\mathbf{${q.toFixed(3)}}$`;
+  if(window.MathJax)MathJax.typeset([$('cmpOut')]);
+  cmpCompare();
+}
+function cmpCompare(){
+  const box=$('cmpBest');
+  if(CMP.q.a1===null||CMP.q.a2===null){box.style.display='none';return;}
+  box.style.display='block';
+  const best=CMP.q.a1>=CMP.q.a2?'$a_1$':'$a_2$';
+  box.innerHTML=`当前比较：$Q(s,a_1)=${CMP.q.a1.toFixed(3)}$，$Q(s,a_2)=${CMP.q.a2.toFixed(3)}$，贪心选择 <span class="hl">${best}</span>。改变 γ 后重新计算，观察最优动作是否翻转。`;
+  if(window.MathJax)MathJax.typeset([box]);
+}
+$('cmpA1').onclick=()=>cmpCalc('a1');
+$('cmpA2').onclick=()=>cmpCalc('a2');
+$('cmpReset').onclick=()=>{CMP.q={a1:null,a2:null};$('cmpOut').textContent='点击动作按钮，查看该动作的奖励、期望后继价值与 Q 值。';cmpCompare();};
+
+/* 演示 4：库存管理模拟 */
+const INV={stock:2,total:0,days:0,short:0,policy:'p0'};
+const invBtns={p0:$('invP0'),p1:$('invP1'),p3:$('invP3')};
+function invDemand(){const r=Math.random();return r<0.3?0:(r<0.8?1:2);}
+function invOrder(){
+  if(INV.policy==='p0')return 0;
+  if(INV.policy==='p1')return 1;
+  return Math.max(0,3-INV.stock);
+}
+function invDay(){
+  const order=invOrder();
+  INV.stock+=order;
+  const demand=invDemand();
+  const end=Math.max(0,INV.stock-demand);
+  const short=Math.max(0,demand-INV.stock);
+  const cost=end*0.1+short*1.0;
+  INV.stock=end;INV.total+=cost;INV.days++;INV.short+=short;
+  $('invDemand').textContent=demand;$('invStock').textContent=end;
+  $('invCost').textContent=cost.toFixed(2);$('invTotal').textContent=INV.total.toFixed(2);
+  $('invDays').textContent=INV.days;$('invShort').textContent=INV.short;
+}
+function invSetPolicy(p){INV.policy=p;Object.values(invBtns).forEach(b=>b.classList.remove('sel'));invBtns[p].classList.add('sel');}
+$('invP0').onclick=()=>invSetPolicy('p0');
+$('invP1').onclick=()=>invSetPolicy('p1');
+$('invP3').onclick=()=>invSetPolicy('p3');
+$('invDay').onclick=invDay;
+$('inv30').onclick=()=>{for(let k=0;k<30;k++)invDay();};
+$('invReset').onclick=()=>{INV.stock=2;INV.total=0;INV.days=0;INV.short=0;invSetPolicy('p0');
+  $('invDemand').textContent='—';$('invStock').textContent='2';$('invCost').textContent='0.00';
+  $('invTotal').textContent='0.00';$('invDays').textContent='0';$('invShort').textContent='0';};
+</script>
+</body>
+</html>
