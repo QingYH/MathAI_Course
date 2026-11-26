@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第一讲 · 马尔科夫过程与马尔科夫链 | 人工智能的数学方法</title>
+<title>第一讲 · 马尔科夫过程与马尔科夫链 | 人工智能数学方法（第三季）</title>
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@600;700&display=swap">
 <script>
   window.MathJax = {
@@ -21,10 +21,10 @@
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html{scroll-behavior:smooth;}
-  body{font-family:"Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.85;-webkit-text-size-adjust:100%;}
+  body{font-family:"Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background-color:var(--bg);background-image:radial-gradient(circle at 1.5px 1.5px, rgba(37,99,168,.10) 1.4px, transparent 1.5px),linear-gradient(rgba(44,138,138,.045) 1px, transparent 1px),linear-gradient(90deg, rgba(44,138,138,.045) 1px, transparent 1px);background-size:34px 34px,34px 34px,34px 34px;color:var(--ink);font-size:19px;line-height:1.9;-webkit-text-size-adjust:100%;}
   .wrap{max-width:1080px;margin:0 auto;padding:0 18px;}
-  header.hero{background:linear-gradient(135deg,#2563a8 0%,#2c8a8a 100%);color:#fff;padding:46px 0 38px;}
-  header.hero .kicker{font-size:15px;letter-spacing:3px;opacity:.85;margin-bottom:10px;}
+  header.hero{background:radial-gradient(circle at 2px 2px, rgba(255,255,255,.13) 2px, transparent 2.6px),linear-gradient(135deg,#2563a8 0%,#2c8a8a 100%);background-size:46px 46px,cover;color:#fff;padding:46px 0 38px;}
+  header.hero .kicker{font-size:16px;letter-spacing:3px;opacity:.85;margin-bottom:10px;}
   header.hero h1{font-size:clamp(26px,4.5vw,38px);font-weight:900;letter-spacing:1px;}
   header.hero p{margin-top:12px;font-size:clamp(15px,2.2vw,18px);opacity:.92;max-width:760px;}
   .back-home{display:inline-flex;align-items:center;gap:8px;margin-top:20px;text-decoration:none;color:#fff;border:1px solid rgba(255,255,255,.5);padding:9px 18px;border-radius:999px;font-size:15px;}
@@ -34,38 +34,38 @@
   nav.toc a{display:inline-block;color:var(--primary);text-decoration:none;font-size:15px;padding:7px 13px;border-radius:20px;flex:0 0 auto;}
   nav.toc a:hover{background:var(--primary-soft);}
   section{padding:38px 0 8px;}
-  h2{font-size:clamp(22px,3.2vw,28px);font-weight:900;color:var(--primary);margin-bottom:16px;padding-left:14px;border-left:5px solid var(--accent);}
-  h3{font-size:19px;font-weight:700;color:var(--ink);margin:22px 0 10px;}
+  h2{font-size:clamp(24px,3.4vw,32px);font-weight:900;color:var(--primary);margin-bottom:16px;padding-left:14px;border-left:5px solid var(--accent);}
+  h3{font-size:21px;font-weight:700;color:var(--ink);margin:22px 0 10px;}
   p{margin:10px 0;}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin:18px 0;}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px;}
   .hl{background:var(--hl);color:var(--hl-ink);font-weight:700;padding:1px 6px;border-radius:5px;}
   .term{color:var(--primary);font-weight:700;}
-  .note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:16px;}
+  .note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:17.5px;}
   .formula{background:#fbfdff;border:1px dashed var(--line);border-radius:12px;padding:14px 16px;margin:14px 0;overflow-x:auto;}
   ul,ol{padding-left:24px;margin:10px 0;}
   li{margin:7px 0;}
   code{background:var(--primary-soft);color:var(--primary);padding:1px 6px;border-radius:5px;font-size:15px;font-family:"SFMono-Regular",Consolas,Menlo,monospace;}
   pre{background:#1f3346;color:#eaf3fb;border-radius:12px;padding:16px;overflow-x:auto;font-size:14.5px;line-height:1.7;margin:12px 0;font-family:"SFMono-Regular",Consolas,Menlo,monospace;}
   pre code{background:transparent;color:inherit;padding:0;}
-  table.data{border-collapse:collapse;width:100%;margin:12px 0;font-size:15.5px;}
+  table.data{border-collapse:collapse;width:100%;margin:12px 0;font-size:17px;}
   table.data th,table.data td{border:1px solid var(--line);padding:9px 12px;text-align:left;}
   table.data th{background:var(--primary-soft);color:var(--primary);}
   table.data td:first-child{white-space:nowrap;font-family:Consolas,Menlo,monospace;color:var(--primary);font-weight:600;}
   .demo-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:14px;}
   .demo-head h3{margin:0;}
-  .badge{display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:700;padding:3px 10px;border-radius:12px;}
-  button.btn{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;}
+  .badge{display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:15px;font-weight:700;padding:3px 10px;border-radius:12px;}
+  button.btn{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:18px;font-weight:600;cursor:pointer;font-family:inherit;}
   button.btn.secondary{background:var(--accent);}
   button.btn.ghost{background:#fff;color:var(--primary);border:1px solid var(--primary);}
   button.btn:active{transform:scale(.97);}
   button.btn:disabled{opacity:.5;cursor:not-allowed;}
   .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0;}
-  .stat{font-size:16px;color:var(--sub);}
+  .stat{font-size:17.5px;color:var(--sub);}
   .stat b{color:var(--ink);}
   table.matrix{border-collapse:collapse;margin:10px 0;}
   table.matrix td{padding:6px 8px;text-align:center;}
-  table.matrix input{width:74px;padding:8px;border:1px solid var(--line);border-radius:8px;font-size:16px;text-align:center;font-family:inherit;}
+  table.matrix input{width:74px;padding:8px;border:1px solid var(--line);border-radius:8px;font-size:17px;text-align:center;font-family:inherit;}
   table.matrix th{font-size:14px;color:var(--sub);padding:4px;}
   svg{max-width:100%;height:auto;display:block;margin:0 auto;}
   canvas{max-width:100%;height:auto;display:block;margin:0 auto;}
@@ -74,7 +74,7 @@
   .freq-bar-bg{flex:1;background:#eef4f9;border-radius:8px;height:22px;overflow:hidden;}
   .freq-bar{height:100%;border-radius:8px;transition:width .3s;}
   .freq-row .val{width:160px;text-align:right;font-size:15px;font-variant-numeric:tabular-nums;}
-  .gen-output{min-height:70px;background:#fbfdff;border:1px solid var(--line);border-radius:12px;padding:14px;font-size:17px;line-height:1.9;}
+  .gen-output{min-height:70px;background:#fbfdff;border:1px solid var(--line);border-radius:12px;padding:14px;font-size:18.5px;line-height:1.9;}
   details{margin:14px 0;border:1px solid var(--line);border-radius:12px;background:#fbfdff;}
   summary{cursor:pointer;padding:12px 16px;font-weight:700;color:var(--accent);list-style:none;}
   summary::before{content:"▸ ";}
@@ -83,9 +83,9 @@
   details .solution{padding:12px 16px;}
   .reveal{opacity:0;transform:translateY(26px);transition:opacity .65s ease,transform .65s ease;}
   .reveal.visible{opacity:1;transform:none;}
-  footer{padding:30px 0 50px;color:var(--sub);font-size:14px;text-align:center;}
+  footer{padding:30px 0 50px;color:var(--sub);font-size:15px;text-align:center;}
   @media (max-width:640px){
-    body{font-size:16px;}
+    body{font-size:17px;}
     .card{padding:16px;}
     header.hero{padding:34px 0 28px;}
     table.matrix input{width:60px;}
@@ -98,7 +98,7 @@
 
 <header class="hero">
   <div class="wrap">
-    <div class="kicker">硕士生课程 · 人工智能的数学方法 · 第一讲</div>
+    <div class="kicker">硕士生课程 · 人工智能数学方法（第三季） · 智能体决策专题 · 第一讲</div>
     <h1>马尔科夫过程与马尔科夫链</h1>
     <p>从天气演变与输入法预测两个直观例子出发，建立马尔科夫性、转移矩阵、多步转移、状态分类与平稳分布的数学框架；配合可交互动态演示，理解其在语言模型、网页排名、序列建模等人工智能场景中的基础作用。</p>
     <a class="back-home" href="人工智能数学方法.html">← 返回课程首页</a>
@@ -228,6 +228,7 @@
     <div class="card reveal"><h3>案例 2：客户品牌转移</h3><p>消费者在甲、乙、丙品牌间流转，$p_{ij}$ 表示本期选 $i$、下期选 $j$ 的概率，市场份额长期预测即求平稳分布。</p></div>
     <div class="card reveal"><h3>案例 3：赌徒破产（吸收链）</h3><p>每次赢 1 元概率 $p$、输 1 元概率 $q$，本金在 $0$ 与 $N$ 之间，两端为吸收态，可求破产概率与平均步数。</p></div>
     <div class="card reveal"><h3>案例 4：网页浏览随机游走</h3><p>浏览者在网页间按链接随机跳转，构成图上的马尔科夫链，其平稳分布即网页重要性 PageRank 的来源。</p></div>
+    <div class="card reveal"><h3>案例 5：会员等级流转</h3><p>用户状态分为<span class="term">普通会员、银卡、金卡、流失</span>四档；每月按转移矩阵在等级间升降或流失，流失为吸收态。平台长期关注各等级会员占比与流失率，本质上就是求该马尔科夫链在不同初始分布下的状态演化与吸收概率，可用于预测会员结构、设计召回策略。</p></div>
   </div>
 </section>
 
@@ -449,12 +450,13 @@
     <div class="freq-row"><span class="label">B</span><div class="freq-bar-bg"><div class="freq-bar" id="rtBar2" style="background:#d99a4a;width:20%"></div></div><span class="val" id="rtVal2">0.200</span></div>
     <div class="freq-row"><span class="label">D 违约</span><div class="freq-bar-bg"><div class="freq-bar" id="rtBar3" style="background:#c0392b;width:0%"></div></div><span class="val" id="rtVal3">0.000</span></div>
     <div class="note">这是一个含吸收态的可约链：长期所有债券最终都会被 D 吸收，只是时间长短不同。信用风险模型正是用这类转移矩阵估计不同期限的累计违约概率。</div>
+    <div class="note" id="rtAnalyze"></div>
   </div>
 </section>
 
 <!-- 14. 课堂练习 -->
 <section id="sec-exercise">
-  <h2 class="reveal">十二、课堂练习（含详解）</h2>
+  <h2 class="reveal">十四、课堂练习（含详解）</h2>
   <div class="card reveal">
     <p>练习 1–4 可用 Python + NumPy 在 20–40 分钟内完成；练习 5–7 为课堂手算题。每道题都附有可折叠的详细解答过程。</p>
 
@@ -547,13 +549,53 @@ print(out)</code></pre>
       <p><strong>(3) 长期趋势：</strong>2、3 之间反复流转的同时，每一步都有概率滑向吸收态 1；因此长时间后，从状态 2 出发最终被状态 1 吸收的概率趋于 1，长期停留在 2、3 的概率趋于 0。这类链不存在把质量分散到 2、3 的唯一平稳分布，其平稳分布把全部质量放在吸收态 1 上。</p>
     </div></details>
 
+    <h3>练习 8：马尔可夫性辨析与长期占比（概念 + 手算）</h3>
+    <p>判断下列三个随机过程是否满足马尔可夫性，并说明理由；对第 (3) 小题手算长期状态占比。</p>
+    <ol>
+      <li>明天下雨的概率只取决于今天是否下雨，与前天及更早天气无关。</li>
+      <li>赌徒下一局输赢取决于他当前已经连续赢了多少把（连胜越长越保守下注）。</li>
+      <li>两状态链 $P=\begin{pmatrix}0.6 & 0.4\\ 0.2 & 0.8\end{pmatrix}$，求长期处于状态 2 的比例。</li>
+    </ol>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p><strong>(1) 满足马尔可夫性。</strong>下一状态条件概率只由当前状态决定，历史天气被当前天气概括，符合 $P(X_{n+1}\mid X_n,X_{n-1},\dots)=P(X_{n+1}\mid X_n)$。</p>
+      <p><strong>(2) 不满足马尔可夫性。</strong>下一动作 / 输赢依赖“连胜次数”这一历史统计量，仅凭当前一局的输赢无法确定转移概率，必须保留更长历史，因此当前状态不足以概括过程，需要扩充状态（把连胜次数并入状态）才可能重建马尔可夫模型。</p>
+      <p><strong>(3) 长期占比。</strong>写成标准形式 $P=\begin{pmatrix}1-a & a\\ b & 1-b\end{pmatrix}$，其中 $a=0.4,\ b=0.2$。两状态链平稳分布为 $\pi_1=\frac{b}{a+b},\ \pi_2=\frac{a}{a+b}$，故</p>
+      <p>$$\pi_2=\frac{0.4}{0.4+0.2}=\frac{2}{3}\approx0.667$$</p>
+      <p>即长期约有 66.7% 的时间处于状态 2。该链不可约、非周期，由遍历定理，无论初始分布如何，长期占比都收敛到这一平稳分布。</p>
+    </div></details>
+
     <div class="note">思考题：为什么周期性链或可约链可能不存在唯一平稳分布？请分别构造一个周期链和一个含两个闭类的可约链，用练习 2 的程序验证解是否唯一。</div>
   </div>
 </section>
 
+<!-- 拓展阅读：代表性文献 -->
+  <section id="sec-refs">
+  <h2 class="reveal">十五、拓展阅读：代表性文献</h2>
+  <div class="card reveal">
+    <p>以下文献分为「经典奠基」与「近年进展（2021 年以来）」两组，各 2 篇与 3 篇；著录含作者、标题、期刊 / 出版社、卷号、期号、页码与年份，链接均为 DOI 持久标识或 arXiv / 官方存档，可直接访问。</p>
+    <h3>经典奠基文献</h3>
+    <h3>[1] A Tutorial on Hidden Markov Models and Selected Applications in Speech Recognition <span class="badge">经典</span></h3>
+    <p>Rabiner, L. R. (1989). A Tutorial on Hidden Markov Models and Selected Applications in Speech Recognition. <em>Proceedings of the IEEE</em>, 77(2), 257–286. DOI: 10.1109/5.18626.</p>
+    <p><a href="https://doi.org/10.1109/5.18626" target="_blank" rel="noopener">https://doi.org/10.1109/5.18626</a></p>
+    <h3>[2] The PageRank Citation Ranking: Bringing Order to the Web <span class="badge">经典</span></h3>
+    <p>Page, L., Brin, S., Motwani, R., Winograd, T. (1999). The PageRank Citation Ranking: Bringing Order to the Web. <em>Stanford InfoLab Technical Report 1999-66, Stanford University</em>.</p>
+    <p><a href="http://ilpubs.stanford.edu:8090/422/" target="_blank" rel="noopener">http://ilpubs.stanford.edu:8090/422/</a></p>
+    <h3>近年进展（2021 年以来）</h3>
+    <h3>[3] Score-Based Generative Modeling through Stochastic Differential Equations <span class="badge">近年</span></h3>
+    <p>Song, Y., Sohl-Dickstein, J., Kingma, D. P., Kumar, A., Ermon, S., Poole, B. (2021). Score-Based Generative Modeling through Stochastic Differential Equations. <em>International Conference on Learning Representations (ICLR 2021)</em>.</p>
+    <p><a href="https://arxiv.org/abs/2011.13456" target="_blank" rel="noopener">https://arxiv.org/abs/2011.13456</a></p>
+    <h3>[4] Markov Chain Monte Carlo in Practice <span class="badge">近年</span></h3>
+    <p>Jones, G. L., Qin, Q. (2022). Markov Chain Monte Carlo in Practice. <em>Annual Review of Statistics and Its Application</em>, 9(1), 557–578. DOI: 10.1146/annurev-statistics-040220-090158.</p>
+    <p><a href="https://doi.org/10.1146/annurev-statistics-040220-090158" target="_blank" rel="noopener">https://doi.org/10.1146/annurev-statistics-040220-090158</a></p>
+    <h3>[5] Convergence Rates of Metropolis–Hastings Algorithms <span class="badge">近年</span></h3>
+    <p>Brown, A., Jones, G. L. (2024). Convergence Rates of Metropolis–Hastings Algorithms. <em>WIREs Computational Statistics</em>, 16(5), e70002. DOI: 10.1002/wics.70002.</p>
+    <p><a href="https://doi.org/10.1002/wics.70002" target="_blank" rel="noopener">https://doi.org/10.1002/wics.70002</a></p>
+  </div>
+  </section>
+
 </main>
 
-<footer><div class="wrap">硕士生课程《人工智能的数学方法》· 第一讲 马尔科夫过程与马尔科夫链 · 公式由 MathJax 渲染</div></footer>
+<footer><div class="wrap">硕士生课程《人工智能数学方法（第三季）》· 第一讲 马尔科夫过程与马尔科夫链 · 2026年</div></footer>
 
 <script>
 const $ = id => document.getElementById(id);
@@ -720,13 +762,20 @@ $('cfReset').onclick=()=>{clearInterval(CF.timer);CF.timer=null;$('cfAuto').text
 cfRender();
 
 /* 演示 7：应用案例 · 信用评级转移（批量分布迭代） */
+const RTP=[[0.90,0.08,0.02,0.00],[0.05,0.85,0.09,0.01],[0.00,0.10,0.82,0.08],[0.00,0.00,0.00,1.00]];
 const RT={pi:[0.4,0.4,0.2,0],n:0};
-function rtAdvance(k){const P=normalizeRows(readMatrix('ratingMatrix'));
-  for(let t=0;t<k;t++)RT.pi=RT.pi.map((_,j)=>RT.pi.reduce((s,x,i)=>s+x*P[i][j],0));
+function rtAdvance(k){
+  for(let t=0;t<k;t++)RT.pi=RT.pi.map((_,j)=>RT.pi.reduce((s,x,i)=>s+x*RTP[i][j],0));
   RT.n+=k;rtRender();}
-function rtRender(){$('rtN').textContent=RT.n;$('rtDef').textContent=RT.pi[3].toFixed(3);
+function rtRender(){
+  $('rtN').textContent=RT.n;$('rtDef').textContent=RT.pi[3].toFixed(3);
   const cols=['#4a90d9','#2c8a8a','#d99a4a','#c0392b'];
-  for(let i=0;i<4;i++){$(`rtBar${i}`).style.width=(RT.pi[i]*100).toFixed(1)+'%';$(`rtBar${i}`).style.background=cols[i];$(`rtVal${i}`).textContent=RT.pi[i].toFixed(3);}}
+  for(let i=0;i<4;i++){$(`rtBar${i}`).style.width=(RT.pi[i]*100).toFixed(1)+'%';$(`rtBar${i}`).style.background=cols[i];$(`rtVal${i}`).textContent=RT.pi[i].toFixed(3);}
+  const names=['AAA','A','B','D'];
+  const top=RT.pi.indexOf(Math.max(...RT.pi.slice(0,3)));
+  const ana=$('rtAnalyze');
+  if(ana)ana.innerHTML=`数据解读：第 ${RT.n} 年，AAA ${(RT.pi[0]*100).toFixed(1)}%、A ${(RT.pi[1]*100).toFixed(1)}%、B ${(RT.pi[2]*100).toFixed(1)}%、违约 ${(RT.pi[3]*100).toFixed(1)}%。投资级（AAA/A）份额逐年下降，违约份额单调上升；由于 D 是吸收态，长期来看组合最终都会被违约状态吸收，只是优质评级迁移到违约的速度更慢。当前存量中占比最高的非违约等级为 <b>${names[top]}</b>。`;
+}
 $('rtStep').onclick=()=>rtAdvance(1);
 $('rtTen').onclick=()=>rtAdvance(10);
 $('rtReset').onclick=()=>{RT.pi=[0.4,0.4,0.2,0];RT.n=0;rtRender();};
