@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第三讲 · 强化学习与 Q-learning | 人工智能的数学方法</title>
+<title>第三讲 · 强化学习与 Q-learning | 人工智能数学方法（第三季）</title>
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@600;700&display=swap">
 <script>
   window.MathJax = {
@@ -21,10 +21,10 @@
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html{scroll-behavior:smooth;}
-  body{font-family:"Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.85;-webkit-text-size-adjust:100%;}
+  body{font-family:"Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background-color:var(--bg);background-image:radial-gradient(circle at 1.5px 1.5px, rgba(37,99,168,.10) 1.4px, transparent 1.5px),linear-gradient(rgba(44,138,138,.045) 1px, transparent 1px),linear-gradient(90deg, rgba(44,138,138,.045) 1px, transparent 1px);background-size:34px 34px,34px 34px,34px 34px;color:var(--ink);font-size:19px;line-height:1.9;-webkit-text-size-adjust:100%;}
   .wrap{max-width:1080px;margin:0 auto;padding:0 18px;}
-  header.hero{background:linear-gradient(135deg,#2563a8 0%,#2c8a8a 100%);color:#fff;padding:46px 0 38px;}
-  header.hero .kicker{font-size:15px;letter-spacing:3px;opacity:.85;margin-bottom:10px;}
+  header.hero{background:radial-gradient(circle at 2px 2px, rgba(255,255,255,.13) 2px, transparent 2.6px),linear-gradient(135deg,#2563a8 0%,#2c8a8a 100%);background-size:46px 46px,cover;color:#fff;padding:46px 0 38px;}
+  header.hero .kicker{font-size:16px;letter-spacing:3px;opacity:.85;margin-bottom:10px;}
   header.hero h1{font-size:clamp(26px,4.5vw,38px);font-weight:900;letter-spacing:1px;}
   header.hero p{margin-top:12px;font-size:clamp(15px,2.2vw,18px);opacity:.92;max-width:760px;}
   .back-home{display:inline-flex;align-items:center;gap:8px;margin-top:20px;text-decoration:none;color:#fff;border:1px solid rgba(255,255,255,.5);padding:9px 18px;border-radius:999px;font-size:15px;}
@@ -34,34 +34,34 @@
   nav.toc a{display:inline-block;color:var(--primary);text-decoration:none;font-size:15px;padding:7px 13px;border-radius:20px;flex:0 0 auto;}
   nav.toc a:hover{background:var(--primary-soft);}
   section{padding:38px 0 8px;}
-  h2{font-size:clamp(22px,3.2vw,28px);font-weight:900;color:var(--primary);margin-bottom:16px;padding-left:14px;border-left:5px solid var(--accent);}
-  h3{font-size:19px;font-weight:700;color:var(--ink);margin:22px 0 10px;}
+  h2{font-size:clamp(24px,3.4vw,32px);font-weight:900;color:var(--primary);margin-bottom:16px;padding-left:14px;border-left:5px solid var(--accent);}
+  h3{font-size:21px;font-weight:700;color:var(--ink);margin:22px 0 10px;}
   p{margin:10px 0;}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin:18px 0;}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px;}
   .hl{background:var(--hl);color:var(--hl-ink);font-weight:700;padding:1px 6px;border-radius:5px;}
   .term{color:var(--primary);font-weight:700;}
-  .note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:16px;}
+  .note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:17.5px;}
   .formula{background:#fbfdff;border:1px dashed var(--line);border-radius:12px;padding:14px 16px;margin:14px 0;overflow-x:auto;}
   ul,ol{padding-left:24px;margin:10px 0;}
   li{margin:7px 0;}
   code{background:var(--primary-soft);color:var(--primary);padding:1px 6px;border-radius:5px;font-size:15px;font-family:"SFMono-Regular",Consolas,Menlo,monospace;}
   pre{background:#1f3346;color:#eaf3fb;border-radius:12px;padding:16px;overflow-x:auto;font-size:14.5px;line-height:1.7;margin:12px 0;font-family:"SFMono-Regular",Consolas,Menlo,monospace;}
   pre code{background:transparent;color:inherit;padding:0;}
-  table.data{border-collapse:collapse;width:100%;margin:12px 0;font-size:15.5px;}
+  table.data{border-collapse:collapse;width:100%;margin:12px 0;font-size:17px;}
   table.data th,table.data td{border:1px solid var(--line);padding:9px 12px;text-align:left;}
   table.data th{background:var(--primary-soft);color:var(--primary);}
   .demo-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:14px;}
   .demo-head h3{margin:0;}
-  .badge{display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:700;padding:3px 10px;border-radius:12px;}
-  button.btn{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;}
+  .badge{display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:15px;font-weight:700;padding:3px 10px;border-radius:12px;}
+  button.btn{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:18px;font-weight:600;cursor:pointer;font-family:inherit;}
   button.btn.secondary{background:var(--accent);}
   button.btn.ghost{background:#fff;color:var(--primary);border:1px solid var(--primary);}
   button.btn:active{transform:scale(.97);}
   .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0;}
-  .stat{font-size:16px;color:var(--sub);}
+  .stat{font-size:17.5px;color:var(--sub);}
   .stat b{color:var(--ink);}
-  input.inp{font-family:inherit;font-size:16px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;width:110px;}
+  input.inp{font-family:inherit;font-size:17.5px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;width:110px;}
   label.ctl{font-size:15px;color:var(--sub);}
   input[type=range]{width:130px;}
   .gridworld{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:460px;margin:0 auto;}
@@ -72,7 +72,7 @@
   .cell.obstacle{background:#c9d4de;}
   .cell.agent{outline:3px solid var(--primary);outline-offset:-3px;}
   canvas{max-width:100%;height:auto;display:block;margin:0 auto;}
-  .gen-output{min-height:60px;background:#fbfdff;border:1px solid var(--line);border-radius:12px;padding:14px;font-size:17px;line-height:1.9;}
+  .gen-output{min-height:60px;background:#fbfdff;border:1px solid var(--line);border-radius:12px;padding:14px;font-size:18.5px;line-height:1.9;}
   button.btn.sel{background:var(--accent);color:#fff;border-color:var(--accent);}
   .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px;margin-top:14px;}
   .kv .box{background:#f6f8f7;border-radius:12px;padding:16px;}
@@ -91,9 +91,9 @@
   details .solution{padding:12px 16px;}
   .reveal{opacity:0;transform:translateY(26px);transition:opacity .65s ease,transform .65s ease;}
   .reveal.visible{opacity:1;transform:none;}
-  footer{padding:30px 0 50px;color:var(--sub);font-size:14px;text-align:center;}
+  footer{padding:30px 0 50px;color:var(--sub);font-size:15px;text-align:center;}
   @media (max-width:640px){
-    body{font-size:16px;}
+    body{font-size:17px;}
     .card{padding:16px;}
     header.hero{padding:34px 0 28px;}
     table.data{font-size:14px;}
@@ -105,7 +105,7 @@
 
 <header class="hero">
   <div class="wrap">
-    <div class="kicker">硕士生课程 · 人工智能的数学方法 · 第三讲</div>
+    <div class="kicker">硕士生课程 · 人工智能数学方法（第三季） · 智能体决策专题 · 第三讲</div>
     <h1>强化学习与 Q-learning</h1>
     <p>当环境转移模型未知时，智能体依靠与环境交互获得的样本进行学习。本讲讨论无模型设定、蒙特卡洛与时序差分思想、动作价值估计、离策略机制与探索–利用权衡，掌握代表性无模型算法 Q-learning 及其收敛条件。</p>
     <a class="back-home" href="人工智能数学方法.html">← 返回课程首页</a>
@@ -222,6 +222,7 @@
     <div class="card reveal"><h3>案例 2：多臂老虎机</h3><p>多台拉杆收益未知，在试拉中估计各臂期望收益，平衡探索新臂与拉动已知最优臂。</p></div>
     <div class="card reveal"><h3>案例 3：游戏智能体</h3><p>以游戏画面 / 局面为状态、操作为动作、得分为奖励，Q 表或其深度逼近版本评价动作优劣。</p></div>
     <div class="card reveal"><h3>案例 4：在线广告与推荐</h3><p>把用户状态作为环境、出价 / 推荐作为动作，在线反馈作为奖励，在持续交互中调整决策。</p></div>
+    <div class="card reveal"><h3>案例 5：自适应教学选题</h3><p>以学生当前掌握程度为状态，选择推送偏易 / 适中 / 偏难题目为动作，答题正确率与进步幅度为奖励。系统在无法事先精确知道学生能力模型的情况下，通过一道道题的反馈估计各难度动作的价值，逐步为不同学生匹配最合适的题目难度，是无模型强化学习在教育场景的典型简化建模。</p></div>
   </div>
 </section>
 
@@ -331,7 +332,7 @@
     <div class="controls">
       <button class="btn" id="adA">曝光广告 A</button>
       <button class="btn" id="adB">曝光广告 B</button>
-      <button class="btn secondary" id="adAuto">贪心自动曝光 50 次</button>
+      <button class="btn secondary" id="adAuto">自动曝光 50 次</button>
       <button class="btn ghost" id="adReset">重置</button>
     </div>
     <div class="kv">
@@ -342,13 +343,15 @@
       <div class="box"><b>累计奖励（点击数）</b><span id="adReward">0</span></div>
       <div class="box"><b>累计遗憾</b><span id="adRegret">0.000</span></div>
     </div>
-    <div class="note">真实系统会用 ε-贪心、UCB 或 Thompson 采样在探索与利用间平衡；纯贪心在早期样本不足时容易把次优广告误判为最优，造成持续遗憾。</div>
+    <canvas id="adCanvas" width="720" height="280" style="margin-top:14px;"></canvas>
+    <div class="note">真实系统会用 ε-贪心、UCB 或 Thompson 采样在探索与利用间平衡；纯贪心在早期样本不足时容易把次优广告误判为最优，造成持续遗憾。蓝色折线为累计点击，橙色折线为累计遗憾。</div>
+    <div class="note" id="adAnalyze"></div>
   </div>
 </section>
 
 <!-- 10. AI 应用 -->
 <section id="sec-ai">
-  <h2 class="reveal">八、强化学习在人工智能中的应用</h2>
+  <h2 class="reveal">十、强化学习在人工智能中的应用</h2>
   <div class="grid">
     <div class="card reveal">
       <h3>8.1 游戏智能体与深度 Q 网络</h3>
@@ -367,11 +370,25 @@
       <p>本讲假设状态可被直接观测；当状态只能通过带噪观测推断时，决策需在信念状态上进行，这是第四讲 POMDP 讨论的内容。</p>
     </div>
   </div>
+
+  <div class="card reveal">
+    <div class="demo-head"><span class="badge">深度 Q 网络 · 价值函数逼近</span><h3>动态演示：用函数逼近替代 Q 表，逼近最优价值曲线</h3></div>
+    <p>当状态空间很大（如图像、机器人状态）时无法存储完整 Q 表，DQN 用神经网络逼近动作价值。下面用最简单的线性模型 $V_\theta(x)=w_0+w_1 x$ 逼近一条 1D 走廊的真实最优价值 $V^*(x)=\gamma^{\,9-x}$（目标在 $x=9$，$\gamma=0.9$）。点击开始训练，观察蓝色拟合曲线如何逐步靠拢灰色真实价值曲线，以及拟合误差如何下降。</p>
+    <div class="controls">
+      <button class="btn secondary" id="dqnPlay">开始训练</button>
+      <button class="btn ghost" id="dqnReset">重置</button>
+      <span class="stat">回合：<b id="dqnEp">0</b></span>
+      <span class="stat">拟合误差 MSE：<b id="dqnErr">—</b></span>
+    </div>
+    <canvas id="dqnCanvas" width="720" height="260" style="margin-top:14px;"></canvas>
+    <div class="note">虚线为真实最优价值 $V^*$，实线为参数模型的当前拟合 $V_\theta$。深度强化学习正是把这条拟合曲线换成多层神经网络，从而在高维状态上泛化。</div>
+    <div class="note" id="dqnAnalyze"></div>
+  </div>
 </section>
 
 <!-- 9. 练习 -->
 <section id="sec-exercise">
-  <h2 class="reveal">九、课堂练习（含详解）</h2>
+  <h2 class="reveal">十一、课堂练习（含详解）</h2>
   <div class="card reveal">
     <p>练习 1、5、6 为课堂手算 / 推导，练习 3、7 可在 30 分钟内用 Python 完成，练习 2、4 为概念讨论。每道题都附有可折叠的详细解答过程。</p>
 
@@ -385,7 +402,11 @@
     <h3>练习 2：离策略含义（概念）</h3>
     <p>为什么说 Q-learning 是离策略算法？它与 SARSA 在更新目标上的关键区别是什么？这一区别对学到策略的保守程度有何影响？</p>
     <details><summary>参考要点</summary><div class="solution">
-      <p>Q-learning 行为策略用于采样（ε-贪心），目标策略是贪心策略，更新目标取 $\max_{a'}Q(s',a')$；SARSA 按实际采取的下一动作 $a'$ 取值，属在策略。因此 Q-learning 倾向学到最优（可能更冒险）的策略，SARSA 会考虑探索本身的风险，策略相对保守。</p>
+      <p><strong>行为策略与目标策略分离：</strong>Q-learning 中，实际与环境交互、产生样本的是带探索的<span class="term">行为策略</span> $\pi_b$（ε-贪心）；而被学习、被改进的是<span class="term">目标策略</span> $\pi_g$（贪心）。更新目标为</p>
+      <p>$$r+\gamma\max_{a'}Q(s',a')$$</p>
+      <p>它对下一动作取 $\max$，假定未来按贪心目标策略行动，与采样时实际选了哪个动作无关，因此是<span class="hl">离策略（off-policy）</span>。</p>
+      <p><strong>与 SARSA 的关键区别：</strong>SARSA 的更新目标是 $r+\gamma Q(s',a')$，其中 $a'$ 是行为策略在 $s'$ 实际采取的动作，目标策略与行为策略相同，属<span class="hl">在策略（on-policy）</span>。</p>
+      <p><strong>对策略保守程度的影响：</strong>Q-learning 估计的是“完全贪心时”的最优价值，不把探索动作本身可能带来的风险计入，学到的策略更激进、更接近理论最优；SARSA 把探索过程中可能踩到的坏动作也计入价值，学到的策略会留出安全余量，相对保守。在存在“靠近悬崖才会掉下去”的环境中，二者差异尤为明显。</p>
     </div></details>
 
     <h3>练习 3：Q-learning 主循环（进阶 · 编程）</h3>
@@ -405,7 +426,11 @@
     <h3>练习 4：收敛条件讨论（推导）</h3>
     <p>为什么要求每个 $(s,a)$ 被无限次访问？若某动作从未被尝试，Q-learning 能否发现它可能是最优的？学习率不满足 Robbins–Monro 条件会出现什么问题？</p>
     <details><summary>参考要点</summary><div class="solution">
-      <p>未被访问的动作其 Q 值保持初值，无法被正确评价，算法可能遗漏最优动作。若 $\sum\alpha_t=\infty$ 不成立，估计值无法充分收敛到真值；若 $\sum\alpha_t^2=\infty$，随机波动可能使估计无法稳定。两个条件共同保证随机逼近依概率收敛。</p>
+      <p><strong>为什么要无限次访问每个 $(s,a)$：</strong>Q 值只能通过实际采样该状态–动作对得到更新；若某动作从未被尝试，其 Q 值一直停留在初值，无法被正确评价，算法就可能把一个其实最优的动作遗漏掉。ε-贪心的持续探索正是为了保证所有动作都有被选中的机会。</p>
+      <p><strong>学习率两个条件的含义：</strong>Robbins–Monro 条件为</p>
+      <p>$$\sum_{t=1}^{\infty}\alpha_t=\infty,\qquad \sum_{t=1}^{\infty}\alpha_t^{2}<\infty$$</p>
+      <p>第一式保证步长累计足够大，使估计能跨越初始偏差、充分逼近真值；若 $\sum\alpha_t<\infty$，后期步长过小，估计无法收敛到真值。第二式保证步长平方累计有限，使随机噪声的总扰动被控制住，估计不会一直震荡发散。两个条件一“足够大”、一“足够小”，共同保证随机逼近依概率收敛到 $Q^{*}$。</p>
+      <p><strong>反例直觉：</strong>若固定 $\alpha=1$ 不衰减，虽满足 $\sum\alpha_t=\infty$，但 $\sum\alpha_t^2=\infty$，估计会被每步样本噪声持续扰动而难以稳定；若 $\alpha$ 衰减过快，则可能过早停止学习，停在次优值附近。</p>
     </div></details>
 
     <h3>练习 5：样本均值在线更新（手算题 · 老虎机）</h3>
@@ -444,13 +469,50 @@ for t in range(1000):
       <p>纯贪心在前期样本少时容易锁定次优臂，累计平均收益偏低；纯随机利用不足；ε-贪心在探索若干臂后逐步转向最优臂，长期平均收益最接近真实最优 0.7。可在演示 3 中切换三种策略直观对照。</p>
     </div></details>
 
+    <h3>练习 8：TD 误差符号与更新方向（手算题）</h3>
+    <p>已知 $Q(s,a)=2.0$，执行动作后奖励 $r=0$，下一状态 $s'$ 的最大动作价值 $\max_{a'}Q(s',a')=1.0$，$\gamma=0.9$，$\alpha=0.5$。(1) 计算 TD 目标与 TD 误差 $\delta$；(2) 判断该动作价值应被上调还是下调，并说明理由；(3) 求更新后的 $Q(s,a)$。</p>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p><strong>(1) TD 目标与误差：</strong></p>
+      <p>$$\text{目标}=r+\gamma\max_{a'}Q(s',a')=0+0.9\times1.0=0.9$$</p>
+      <p>$$\delta=\text{目标}-Q(s,a)=0.9-2.0=-1.1$$</p>
+      <p><strong>(2) 更新方向：</strong>$\delta<0$，说明当前估计 $Q(s,a)=2.0$ 高于“即时奖励加后继最优价值”所支持的水平，因此该动作价值应被<span class="hl">下调</span>。TD 误差为正表示高估不足、需要上调；为负表示高估、需要下调。</p>
+      <p><strong>(3) 更新后价值：</strong></p>
+      <p>$$Q(s,a)\leftarrow Q(s,a)+\alpha\delta=2.0+0.5\times(-1.1)=1.45$$</p>
+      <p>学习率 $\alpha$ 控制每次向目标靠拢的步长：$\alpha$ 越大调整越剧烈但容易震荡，$\alpha$ 越小越平稳但收敛越慢；长期按 Robbins–Monro 条件衰减时，估计值收敛到 $Q^{*}$。</p>
+    </div></details>
+
     <div class="note">思考题：Q-learning 用 $\max$ 估计下一状态价值，在价值估计存在噪声时会带来什么偏差？Double Q-learning 是如何缓解这一问题的？</div>
   </div>
 </section>
 
+<!-- 拓展阅读：代表性文献 -->
+  <section id="sec-refs">
+  <h2 class="reveal">十二、拓展阅读：代表性文献</h2>
+  <div class="card reveal">
+    <p>以下文献分为「经典奠基」与「近年进展（2021 年以来）」两组，各 2 篇与 3 篇；著录含作者、标题、期刊 / 出版社、卷号、期号、页码与年份，链接均为 DOI 持久标识或 arXiv / 官方存档，可直接访问。</p>
+    <h3>经典奠基文献</h3>
+    <h3>[1] Learning to Predict by the Methods of Temporal Differences <span class="badge">经典</span></h3>
+    <p>Sutton, R. S. (1988). Learning to Predict by the Methods of Temporal Differences. <em>Machine Learning</em>, 3(1), 9–44. DOI: 10.1007/BF00115009.</p>
+    <p><a href="https://doi.org/10.1007/BF00115009" target="_blank" rel="noopener">https://doi.org/10.1007/BF00115009</a></p>
+    <h3>[2] Q-learning <span class="badge">经典</span></h3>
+    <p>Watkins, C. J. C. H., Dayan, P. (1992). Q-learning. <em>Machine Learning</em>, 8(3–4), 279–292. DOI: 10.1007/BF00992698.</p>
+    <p><a href="https://doi.org/10.1007/BF00992698" target="_blank" rel="noopener">https://doi.org/10.1007/BF00992698</a></p>
+    <h3>近年进展（2021 年以来）</h3>
+    <h3>[3] Transfer Learning in Deep Reinforcement Learning: A Survey <span class="badge">近年</span></h3>
+    <p>Zhu, Z., Lin, K., Jain, A. K., Zhou, J. (2023). Transfer Learning in Deep Reinforcement Learning: A Survey. <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em>, 45(11), 13344–13362. DOI: 10.1109/TPAMI.2023.3292075.</p>
+    <p><a href="https://doi.org/10.1109/TPAMI.2023.3292075" target="_blank" rel="noopener">https://doi.org/10.1109/TPAMI.2023.3292075</a> ｜ 开放全文：<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11018366/" target="_blank" rel="noopener">PMC11018366</a></p>
+    <h3>[4] A Survey on Offline Reinforcement Learning: Taxonomy, Review, and Open Problems <span class="badge">近年</span></h3>
+    <p>Prudencio, R. F., Maximo, M. R. O. A., Colombini, E. L. (2024). A Survey on Offline Reinforcement Learning: Taxonomy, Review, and Open Problems. <em>IEEE Transactions on Neural Networks and Learning Systems</em>, 35(8), 10237–10257. DOI: 10.1109/TNNLS.2023.3250269.</p>
+    <p><a href="https://doi.org/10.1109/TNNLS.2023.3250269" target="_blank" rel="noopener">https://doi.org/10.1109/TNNLS.2023.3250269</a></p>
+    <h3>[5] A Survey on Causal Reinforcement Learning <span class="badge">近年</span></h3>
+    <p>Zeng, Y., Cai, R., Sun, F., Huang, L., Hao, Z. (2025). A Survey on Causal Reinforcement Learning. <em>IEEE Transactions on Neural Networks and Learning Systems</em>, 36(4), 5942–5962. DOI: 10.1109/TNNLS.2024.3403001.</p>
+    <p><a href="https://doi.org/10.1109/TNNLS.2024.3403001" target="_blank" rel="noopener">https://doi.org/10.1109/TNNLS.2024.3403001</a> ｜ 开放全文：<a href="https://arxiv.org/abs/2302.05209" target="_blank" rel="noopener">arXiv:2302.05209</a></p>
+  </div>
+  </section>
+
 </main>
 
-<footer><div class="wrap">硕士生课程《人工智能的数学方法》· 第三讲 强化学习与 Q-learning · 公式由 MathJax 渲染</div></footer>
+<footer><div class="wrap">硕士生课程《人工智能数学方法（第三季）》· 第三讲 强化学习与 Q-learning · 2026年</div></footer>
 
 <script>
 const $ = id => document.getElementById(id);
@@ -596,9 +658,9 @@ $('bdPRandom').onclick=()=>bdSet('random',{eps:$('bdPEps'),greedy:$('bdPGreedy')
 $('bdReset').onclick=()=>{BD.counts=[0,0,0];BD.sum=[0,0,0];BD.est=[0,0,0];BD.total=0;BD.n=0;bdRender();};
 bdRender();
 
-/* 演示 4：广告位选择 */
-const AD={means:[0.4,0.6],imp:[0,0],clk:[0,0],reward:0,regret:0,best:0.6};
-function adShow(a){const r=Math.random()<AD.means[a]?1:0;AD.imp[a]++;AD.clk[a]+=r;AD.reward+=r;AD.regret+=AD.best-AD.means[a];adRender();}
+/* 演示 4：广告位选择（自动播放 + 曲线 + 解读） */
+const AD={means:[0.4,0.6],imp:[0,0],clk:[0,0],reward:0,regret:0,best:0.6,hReward:[],hRegret:[],timer:null};
+function adShow(a){const r=Math.random()<AD.means[a]?1:0;AD.imp[a]++;AD.clk[a]+=r;AD.reward+=r;AD.regret+=AD.best-AD.means[a];AD.hReward.push(AD.reward);AD.hRegret.push(AD.regret);adRender();}
 function adGreedy(){const ctr=i=>AD.imp[i]?AD.clk[i]/AD.imp[i]:1;return ctr(0)>=ctr(1)?0:1;}
 function adRender(){
   const c0=AD.imp[0]?AD.clk[0]/AD.imp[0]:null, c1=AD.imp[1]?AD.clk[1]/AD.imp[1]:null;
@@ -608,12 +670,92 @@ function adRender(){
   $('adBCtr').textContent=c1===null?'—':c1.toFixed(3);
   $('adReward').textContent=AD.reward;
   $('adRegret').textContent=AD.regret.toFixed(3);
+  adChart();adAnalyze();
 }
-$('adA').onclick=()=>adShow(0);
-$('adB').onclick=()=>adShow(1);
-$('adAuto').onclick=()=>{for(let k=0;k<50;k++)adShow(adGreedy());};
-$('adReset').onclick=()=>{AD.imp=[0,0];AD.clk=[0,0];AD.reward=0;AD.regret=0;adRender();};
+function adChart(){
+  const cv=$('adCanvas');const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height,pad=34;ctx.clearRect(0,0,W,H);
+  const n=AD.hReward.length;if(!n)return;
+  const maxR=Math.max(1,...AD.hRegret);
+  const X=i=>pad+(W-2*pad)*(n===1?0.5:i/(50-1));
+  const Yrw=v=>H-pad-(H-2*pad)*(v/50);
+  const Yrg=v=>H-pad-(H-2*pad)*(v/maxR);
+  ctx.strokeStyle='#e6edf3';ctx.lineWidth=1;
+  for(let g=0;g<=5;g++){const y=H-pad-(H-2*pad)*g/5;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(W-pad,y);ctx.stroke();}
+  ctx.font='13px sans-serif';ctx.fillStyle='#51647a';ctx.fillText('点击',6,16);ctx.fillText('遗憾',W-pad-44,16);
+  ctx.strokeStyle='#2f6db3';ctx.lineWidth=2.5;ctx.beginPath();
+  AD.hReward.forEach((v,i)=>{const x=X(i),y=Yrw(v);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
+  ctx.strokeStyle='#d98a2b';ctx.lineWidth=2.5;ctx.beginPath();
+  AD.hRegret.forEach((v,i)=>{const x=X(i),y=Yrg(v);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
+  ctx.fillStyle='#2f6db3';ctx.fillText('累计点击',pad+4,H-10);
+  ctx.fillStyle='#d98a2b';ctx.fillText('累计遗憾',pad+72,H-10);
+}
+function adAnalyze(){
+  const box=$('adAnalyze');if(!box)return;
+  const n=AD.imp[0]+AD.imp[1];
+  if(n===0){box.textContent='点击左侧按钮手动曝光，或点“自动曝光 50 次”观察点击率估计与遗憾的演化。';return;}
+  const c0=AD.imp[0]?AD.clk[0]/AD.imp[0]:0,c1=AD.imp[1]?AD.clk[1]/AD.imp[1]:0;
+  const pickB=AD.imp[1]>AD.imp[0]?1:0;
+  box.innerHTML=`结果解读：共曝光 ${n} 次，累计点击 ${AD.reward} 次，累计遗憾 ${AD.regret.toFixed(3)}。广告 A 样本 ${AD.imp[0]} 次、估计 CTR ${c0.toFixed(3)}（真实 0.40）；广告 B 样本 ${AD.imp[1]} 次、估计 CTR ${c1.toFixed(3)}（真实 0.60）。贪心策略当前更偏向 ${pickB?'广告 B（较优）':'广告 A（可能被早期样本误导）'}。遗憾主要来自把曝光分给 CTR 较低的广告；探索不足时估计容易偏离真实值，因此在线系统普遍采用 ε-贪心、UCB 或 Thompson 采样。`;
+}
+function adStop(){if(AD.timer){clearInterval(AD.timer);AD.timer=null;$('adAuto').textContent='自动曝光 50 次';}}
+$('adA').onclick=()=>{adStop();adShow(0);};
+$('adB').onclick=()=>{adStop();adShow(1);};
+$('adAuto').onclick=()=>{
+  if(AD.timer){adStop();return;}
+  $('adAuto').textContent='暂停';
+  AD.timer=setInterval(()=>{if(AD.imp[0]+AD.imp[1]>=50){adStop();return;}adShow(adGreedy());},200);
+};
+$('adReset').onclick=()=>{adStop();AD.imp=[0,0];AD.clk=[0,0];AD.reward=0;AD.regret=0;AD.hReward=[];AD.hRegret=[];adRender();};
 adRender();
+
+/* 演示 5：DQN 价值函数逼近示意 */
+const DQN={w0:0,w1:0,ep:0,err:null,timer:null,gamma:0.9,eta:0.06};
+function dqnVstar(x){return Math.pow(DQN.gamma,9-x);}
+function dqnF(x){return DQN.w0+DQN.w1*x;}
+function dqnStep(){
+  for(let k=0;k<8;k++){
+    const x=Math.floor(Math.random()*10);
+    const t=dqnVstar(x),f=dqnF(x),e=f-t;
+    DQN.w0-=DQN.eta*e;DQN.w1-=DQN.eta*e*x;
+  }
+  DQN.ep++;
+  let mse=0;for(let x=0;x<=9;x++){const e=dqnF(x)-dqnVstar(x);mse+=e*e;}
+  DQN.err=mse/10;dqnRender();
+}
+function dqnRender(){
+  const cv=$('dqnCanvas'),ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height,pad=30;ctx.clearRect(0,0,W,H);
+  const X=x=>pad+(W-2*pad)*(x/9);
+  const Y=v=>H-pad-(H-2*pad)*v;
+  ctx.strokeStyle='#e6edf3';ctx.lineWidth=1;
+  for(let g=0;g<=4;g++){const y=Y(g/4);ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(W-pad,y);ctx.stroke();}
+  ctx.font='13px sans-serif';ctx.fillStyle='#51647a';
+  for(let g=0;g<=4;g++)ctx.fillText((g/4).toFixed(2),4,Y(g/4)+4);
+  // 真实价值虚线
+  ctx.strokeStyle='#9aa7b5';ctx.lineWidth=2;ctx.setLineDash([6,5]);ctx.beginPath();
+  for(let x=0;x<=9;x++){const px=X(x),py=Y(dqnVstar(x));x?ctx.lineTo(px,py):ctx.moveTo(px,py);}ctx.stroke();ctx.setLineDash([]);
+  // 拟合实线
+  ctx.strokeStyle='#2f6db3';ctx.lineWidth=2.5;ctx.beginPath();
+  for(let x=0;x<=9;x++){const px=X(x),py=Y(Math.max(0,Math.min(1,dqnF(x))));x?ctx.lineTo(px,py):ctx.moveTo(px,py);}ctx.stroke();
+  ctx.fillStyle='#9aa7b5';ctx.fillText('真实 $V^*$',pad+4,16);
+  ctx.fillStyle='#2f6db3';ctx.fillText('拟合 $V_\\theta$',pad+86,16);
+  $('dqnEp').textContent=DQN.ep;
+  $('dqnErr').textContent=DQN.err===null?'—':DQN.err.toFixed(4);
+  const box=$('dqnAnalyze');
+  if(box){
+    if(DQN.ep===0){box.textContent='点击“开始训练”，观察拟合曲线向真实价值曲线靠拢。';}
+    else box.innerHTML=`结果解读：训练 ${DQN.ep} 回合后，全区间均方误差 MSE=${DQN.err.toFixed(4)}。线性模型只能近似指数衰减的真实价值，在两端仍有偏差；这正是深度 Q 网络用非线性神经网络替代线性拟合的原因——网络能表达更复杂的价值曲面，并在高维状态间泛化。`;
+  }
+}
+function dqnStop(){if(DQN.timer){clearInterval(DQN.timer);DQN.timer=null;$('dqnPlay').textContent='开始训练';}}
+$('dqnPlay').onclick=()=>{
+  if(DQN.timer){dqnStop();return;}
+  $('dqnPlay').textContent='暂停';
+  DQN.timer=setInterval(()=>{if(DQN.ep>=120){dqnStop();return;}dqnStep();},200);
+};
+$('dqnReset').onclick=()=>{dqnStop();DQN.w0=0;DQN.w1=0;DQN.ep=0;DQN.err=null;dqnRender();};
+dqnRender();
 </script>
 </body>
 </html>
