@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第四讲 · 部分可观测决策与 POMDP | 人工智能的数学方法</title>
+<title>第四讲 · 部分可观测决策与 POMDP | 人工智能数学方法（第三季）</title>
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@600;700&display=swap">
 <script>
   window.MathJax = {
@@ -21,10 +21,10 @@
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html{scroll-behavior:smooth;}
-  body{font-family:"Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.85;-webkit-text-size-adjust:100%;}
+  body{font-family:"Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background-color:var(--bg);background-image:radial-gradient(circle at 1.5px 1.5px, rgba(37,99,168,.10) 1.4px, transparent 1.5px),linear-gradient(rgba(44,138,138,.045) 1px, transparent 1px),linear-gradient(90deg, rgba(44,138,138,.045) 1px, transparent 1px);background-size:34px 34px,34px 34px,34px 34px;color:var(--ink);font-size:19px;line-height:1.9;-webkit-text-size-adjust:100%;}
   .wrap{max-width:1080px;margin:0 auto;padding:0 18px;}
-  header.hero{background:linear-gradient(135deg,#2563a8 0%,#2c8a8a 100%);color:#fff;padding:46px 0 38px;}
-  header.hero .kicker{font-size:15px;letter-spacing:3px;opacity:.85;margin-bottom:10px;}
+  header.hero{background:radial-gradient(circle at 2px 2px, rgba(255,255,255,.13) 2px, transparent 2.6px),linear-gradient(135deg,#2563a8 0%,#2c8a8a 100%);background-size:46px 46px,cover;color:#fff;padding:46px 0 38px;}
+  header.hero .kicker{font-size:16px;letter-spacing:3px;opacity:.85;margin-bottom:10px;}
   header.hero h1{font-size:clamp(26px,4.5vw,38px);font-weight:900;letter-spacing:1px;}
   header.hero p{margin-top:12px;font-size:clamp(15px,2.2vw,18px);opacity:.92;max-width:760px;}
   .back-home{display:inline-flex;align-items:center;gap:8px;margin-top:20px;text-decoration:none;color:#fff;border:1px solid rgba(255,255,255,.5);padding:9px 18px;border-radius:999px;font-size:15px;}
@@ -34,33 +34,33 @@
   nav.toc a{display:inline-block;color:var(--primary);text-decoration:none;font-size:15px;padding:7px 13px;border-radius:20px;flex:0 0 auto;}
   nav.toc a:hover{background:var(--primary-soft);}
   section{padding:38px 0 8px;}
-  h2{font-size:clamp(22px,3.2vw,28px);font-weight:900;color:var(--primary);margin-bottom:16px;padding-left:14px;border-left:5px solid var(--accent);}
-  h3{font-size:19px;font-weight:700;color:var(--ink);margin:22px 0 10px;}
+  h2{font-size:clamp(24px,3.4vw,32px);font-weight:900;color:var(--primary);margin-bottom:16px;padding-left:14px;border-left:5px solid var(--accent);}
+  h3{font-size:21px;font-weight:700;color:var(--ink);margin:22px 0 10px;}
   p{margin:10px 0;}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin:18px 0;}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px;}
   .hl{background:var(--hl);color:var(--hl-ink);font-weight:700;padding:1px 6px;border-radius:5px;}
   .term{color:var(--primary);font-weight:700;}
-  .note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:16px;}
+  .note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:17.5px;}
   .formula{background:#fbfdff;border:1px dashed var(--line);border-radius:12px;padding:14px 16px;margin:14px 0;overflow-x:auto;}
   ul,ol{padding-left:24px;margin:10px 0;}
   li{margin:7px 0;}
   code{background:var(--primary-soft);color:var(--primary);padding:1px 6px;border-radius:5px;font-size:15px;font-family:"SFMono-Regular",Consolas,Menlo,monospace;}
   pre{background:#1f3346;color:#eaf3fb;border-radius:12px;padding:16px;overflow-x:auto;font-size:14.5px;line-height:1.7;margin:12px 0;font-family:"SFMono-Regular",Consolas,Menlo,monospace;}
   pre code{background:transparent;color:inherit;padding:0;}
-  table.data{border-collapse:collapse;width:100%;margin:12px 0;font-size:15.5px;}
+  table.data{border-collapse:collapse;width:100%;margin:12px 0;font-size:17px;}
   table.data th,table.data td{border:1px solid var(--line);padding:9px 12px;text-align:left;}
   table.data th{background:var(--primary-soft);color:var(--primary);}
   .demo-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:14px;}
   .demo-head h3{margin:0;}
-  .badge{display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:700;padding:3px 10px;border-radius:12px;}
-  button.btn{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;}
+  .badge{display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:15px;font-weight:700;padding:3px 10px;border-radius:12px;}
+  button.btn{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:18px;font-weight:600;cursor:pointer;font-family:inherit;}
   button.btn.secondary{background:var(--accent);}
   button.btn.ghost{background:#fff;color:var(--primary);border:1px solid var(--primary);}
   button.btn.sel{background:var(--accent);color:#fff;border-color:var(--accent);}
   button.btn:active{transform:scale(.97);}
   .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0;}
-  .stat{font-size:16px;color:var(--sub);}
+  .stat{font-size:17.5px;color:var(--sub);}
   .stat b{color:var(--ink);}
   table.matrix{border-collapse:collapse;margin:10px 0;}
   table.matrix td{padding:6px 8px;text-align:center;}
@@ -89,9 +89,9 @@
   details .solution{padding:12px 16px;}
   .reveal{opacity:0;transform:translateY(26px);transition:opacity .65s ease,transform .65s ease;}
   .reveal.visible{opacity:1;transform:none;}
-  footer{padding:30px 0 50px;color:var(--sub);font-size:14px;text-align:center;}
+  footer{padding:30px 0 50px;color:var(--sub);font-size:15px;text-align:center;}
   @media (max-width:640px){
-    body{font-size:16px;}
+    body{font-size:17px;}
     .card{padding:16px;}
     header.hero{padding:34px 0 28px;}
     table.data{font-size:14px;}
@@ -103,7 +103,7 @@
 
 <header class="hero">
   <div class="wrap">
-    <div class="kicker">硕士生课程 · 人工智能的数学方法 · 第四讲</div>
+    <div class="kicker">硕士生课程 · 人工智能数学方法（第三季） · 智能体决策专题 · 第四讲</div>
     <h1>部分可观测决策与 POMDP</h1>
     <p>真实智能体往往只能获得带噪、不完全的观测。本讲先以隐马尔可夫模型（HMM）建立观测与推断的概率基础，再引入信念状态与贝叶斯更新，把决策建立在对隐藏状态的概率推断之上，讨论信念 MDP 的求解难度与近似方法。</p>
     <a class="back-home" href="人工智能数学方法.html">← 返回课程首页</a>
@@ -240,6 +240,7 @@
     <div class="card reveal"><h3>案例 2：移动机器人定位</h3><p>位置不可精确获知，运动模型做预测、传感器读数做修正，信念分布随滤波不断收敛到真实位置附近。</p></div>
     <div class="card reveal"><h3>案例 3：医疗诊断决策</h3><p>病理状态隐藏，检查结果是带噪观测；在病情信念上安排检查与治疗，平衡信息获取、疗效与成本。</p></div>
     <div class="card reveal"><h3>案例 4：对话状态跟踪</h3><p>用户意图是隐状态，语音识别与文本是观测；系统维护意图信念并据此选择回复动作，是对话管理的常见建模方式。</p></div>
+    <div class="card reveal"><h3>案例 5：设备故障诊断</h3><p>机器真实状态（正常 / 磨损 / 故障）无法直接拆开查看，只能观测振动、温度、噪声等带噪指标。运维系统在状态信念上选择动作：继续运行、安排检查或停机维修；诊断过程就是不断用观测似然更新信念，再在“避免误停”与“防止带病运行”之间权衡，是 POMDP 在工业维护中的典型应用。</p></div>
   </div>
 </section>
 
@@ -385,7 +386,7 @@
 
 <!-- 11. 演示 5：概念例子 · 问诊贝叶斯更新 -->
 <section id="sec-demo5">
-  <h2 class="reveal">十一、易理解的交互例子：医生问诊，逐步更新病情信念</h2>
+  <h2 class="reveal">十、易理解的交互例子：医生问诊，逐步更新病情信念</h2>
   <div class="card reveal">
     <div class="demo-head"><span class="badge">贝叶斯修正</span><h3>两个候选疾病，靠症状证据不断修正后验</h3></div>
     <p>隐状态为两种疾病：<span class="term">感冒</span>、<span class="term">过敏</span>，初始先验各 0.5。每点击一个症状，就用该症状在两种疾病下的似然对当前信念加权并归一化：$b'(s)\propto Z(o\mid s)b(s)$。可连续点击多个症状，观察后验如何随证据向某一疾病集中。</p>
@@ -408,7 +409,7 @@
 
 <!-- 12. 演示 6：应用案例 · 对话意图跟踪 -->
 <section id="sec-demo6">
-  <h2 class="reveal">十二、可交互的应用案例：对话系统的意图信念跟踪</h2>
+  <h2 class="reveal">十一、可交互的应用案例：对话系统的意图信念跟踪</h2>
   <div class="card reveal">
     <div class="demo-head"><span class="badge">对话状态跟踪</span><h3>根据用户关键词，更新三种意图的后验概率</h3></div>
     <p>用户真实意图是隐状态：<span class="term">订票</span>、<span class="term">退票</span>、<span class="term">查询</span>；识别出的关键词是带噪观测。初始三种意图等概率，每点一个关键词，按似然加权归一化，更新意图信念。系统据此选择回复动作（订票流程 / 退票流程 / 信息查询）。</p>
@@ -434,7 +435,7 @@
 
 <!-- 13. AI 应用 -->
 <section id="sec-ai">
-  <h2 class="reveal">十、部分可观测方法在人工智能中的应用</h2>
+  <h2 class="reveal">十二、部分可观测方法在人工智能中的应用</h2>
   <div class="grid">
     <div class="card reveal"><h3>10.1 语音识别与词性标注</h3><p>声学信号 / 词语是观测，音素 / 词性是隐状态；HMM 前向与 Viterbi 是早期语音识别与序列标注的核心算法。</p></div>
     <div class="card reveal"><h3>10.2 医疗诊断决策</h3><p>病情为隐状态，检查结果为观测；POMDP 框架用于安排检查与治疗，平衡信息获取、疗效与成本。</p></div>
@@ -445,7 +446,7 @@
 
 <!-- 11. 练习 -->
 <section id="sec-exercise">
-  <h2 class="reveal">十一、课堂练习（含详解）</h2>
+  <h2 class="reveal">十三、课堂练习（含详解）</h2>
   <div class="card reveal">
     <p>练习 1、2、5、6 为课堂手算 / 推导，练习 4、7 可在 30 分钟内用 Python 完成，练习 3 为概念讨论。每道题都附有可折叠的详细解答过程。</p>
 
@@ -464,7 +465,9 @@
     <h3>练习 3：Viterbi 路径（对照演示）</h3>
     <p>观察演示 2 的 $\delta$ 与 $\psi$ 表，说明回溯顺序：为什么要从最后一步最大 $\delta_T$ 的状态出发，而不是从第一步开始正向选最大？</p>
     <details><summary>参考要点</summary><div class="solution">
-      <p>Viterbi 求的是整条路径的联合概率最大，局部最优不等于全局最优。$\delta_t(j)$ 已汇总到达 $j$ 的最优前缀，$\psi$ 记录其来源；只有从终点最优状态反向回溯，才能还原出全局最优的完整隐状态序列。</p>
+      <p><strong>优化目标是整条路径，而非单步：</strong>Viterbi 要找使联合概率 $P(q_1,\dots,q_T,O\mid\lambda)$ 最大的完整隐状态序列，局部某一步看起来概率最大的状态，未必属于全局最优路径，因此“正向每步选最大”会出错。</p>
+      <p><strong>$\delta$ 与 $\psi$ 的作用：</strong>递推时 $\delta_t(j)$ 保存“到达状态 $j$ 的最优前缀路径”的最大概率，指针 $\psi_t(j)$ 记录这个最优前缀来自上一步哪个状态。这样每个状态都只保留一条最优祖先链，避免枚举所有指数级路径。</p>
+      <p><strong>为什么必须反向回溯：</strong>最后一步，先在 $\delta_T$ 中取最大的状态作为终点；再沿 $\psi$ 指针逐步退回 $T-1,T-2,\dots,1$，得到的序列才是全局最优路径。正向开始时还不知道终点落在哪，前缀的优劣要结合后续观测才能判定，因此只能从终点回溯还原。</p>
     </div></details>
 
     <h3>练习 4：信念 MDP 编程框架（进阶 · 编程）</h3>
@@ -514,13 +517,51 @@ print([round(x, 3) for x in b])</code></pre>
       <p>第一步“机票”后：加权 $(0.2333,0.0333,0.0667)$，归一化常数 $0.3333$，信念 $\approx(0.700,0.100,0.200)$。第二步“退”后：加权 $(0.0700,0.0800,0.0200)$，常数 $0.1700$，信念 $\approx(0.412,0.471,0.118)$。两条相互矛盾的证据使“订票”与“退票”信念接近，系统此时通常会追问以进一步区分意图。</p>
     </div></details>
 
+    <h3>练习 8：归一化常数与信念熵比较（手算题）</h3>
+    <p>某两状态问题在收到一条观测后，得到未归一化的似然加权信念：情形一 $\tilde b=(0.36,\,0.24)$，情形二 $\tilde b=(0.30,\,0.30)$。(1) 分别求归一化常数 $\Pr(o\mid b,a)$ 与归一化后验信念；(2) 用二元信念熵 $H(b)=-\sum_s b(s)\log_2 b(s)$ 比较两种情形哪种不确定性更高。</p>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p><strong>(1) 情形一：</strong>归一化常数 $\Pr(o)=\,0.36+0.24=0.60$，后验</p>
+      <p>$$b'(A)=\frac{0.36}{0.60}=0.60,\qquad b'(B)=\frac{0.24}{0.60}=0.40$$</p>
+      <p><strong>情形二：</strong>归一化常数 $\Pr(o)=0.30+0.30=0.60$，后验</p>
+      <p>$$b'(A)=\frac{0.30}{0.60}=0.50,\qquad b'(B)=\frac{0.30}{0.60}=0.50$$</p>
+      <p><strong>(2) 信念熵：</strong></p>
+      <p>情形一：$H=-0.60\log_2 0.60-0.40\log_2 0.40\approx0.971$ 比特；</p>
+      <p>情形二：$H=-0.50\log_2 0.50-0.50\log_2 0.50=1.000$ 比特。</p>
+      <p>情形二信念均匀分布，熵更大、不确定性更高；情形一已向状态 $A$ 倾斜，置信度更高。在 POMDP 中，高信念熵往往意味着应优先选择“获取信息”的观测动作，把信念进一步集中后再做高成本决策。</p>
+    </div></details>
+
     <div class="note">思考题：信念熵越高代表不确定性越强。为什么 POMDP 最优策略可能主动选择“获取信息”的动作，而不只追求即时奖励？这与纯贪心 MDP 策略有何不同？</div>
   </div>
 </section>
 
+<!-- 拓展阅读：代表性文献 -->
+  <section id="sec-refs">
+  <h2 class="reveal">十四、拓展阅读：代表性文献</h2>
+  <div class="card reveal">
+    <p>以下文献分为「经典奠基」与「近年进展（2021 年以来）」两组，各 2 篇与 3 篇；著录含作者、标题、期刊 / 出版社、卷号、期号、页码与年份，链接均为 DOI 持久标识或 arXiv / 官方存档，可直接访问。</p>
+    <h3>经典奠基文献</h3>
+    <h3>[1] Planning and Acting in Partially Observable Stochastic Domains <span class="badge">经典</span></h3>
+    <p>Kaelbling, L. P., Littman, M. L., Cassandra, A. R. (1998). Planning and Acting in Partially Observable Stochastic Domains. <em>Artificial Intelligence</em>, 101(1–2), 99–134. DOI: 10.1016/S0004-3702(98)00023-X.</p>
+    <p><a href="https://doi.org/10.1016/S0004-3702(98)00023-X" target="_blank" rel="noopener">https://doi.org/10.1016/S0004-3702(98)00023-X</a></p>
+    <h3>[2] A Tutorial on Hidden Markov Models and Selected Applications in Speech Recognition <span class="badge">经典</span></h3>
+    <p>Rabiner, L. R. (1989). A Tutorial on Hidden Markov Models and Selected Applications in Speech Recognition. <em>Proceedings of the IEEE</em>, 77(2), 257–286. DOI: 10.1109/5.18626.</p>
+    <p><a href="https://doi.org/10.1109/5.18626" target="_blank" rel="noopener">https://doi.org/10.1109/5.18626</a></p>
+    <h3>近年进展（2021 年以来）</h3>
+    <h3>[3] Partially Observable Markov Decision Processes in Robotics: A Survey <span class="badge">近年</span></h3>
+    <p>Lauri, M., Hsu, D., Pajarinen, J. (2023). Partially Observable Markov Decision Processes in Robotics: A Survey. <em>IEEE Transactions on Robotics</em>, 39(1), 21–40. DOI: 10.1109/TRO.2022.3200138.</p>
+    <p><a href="https://doi.org/10.1109/TRO.2022.3200138" target="_blank" rel="noopener">https://doi.org/10.1109/TRO.2022.3200138</a> ｜ 开放全文：<a href="https://arxiv.org/abs/2209.10342" target="_blank" rel="noopener">arXiv:2209.10342</a></p>
+    <h3>[4] From Reactive to Active Sensing: A Survey on Information Gathering in Decision-theoretic Planning <span class="badge">近年</span></h3>
+    <p>Veiga, T., Renoux, J. (2023). From Reactive to Active Sensing: A Survey on Information Gathering in Decision-theoretic Planning. <em>ACM Computing Surveys</em>, 55(13s), Article 280, 1–22. DOI: 10.1145/3583068.</p>
+    <p><a href="https://doi.org/10.1145/3583068" target="_blank" rel="noopener">https://doi.org/10.1145/3583068</a> ｜ 开放全文：<a href="https://jrenoux.github.io/publication/veiga-2023-from/veiga-2023-from.pdf" target="_blank" rel="noopener">作者主页 PDF</a></p>
+    <h3>[5] A Survey of Knowledge-based Sequential Decision-making under Uncertainty <span class="badge">近年</span></h3>
+    <p>Zhang, S., Sridharan, M. (2022). A Survey of Knowledge-based Sequential Decision-making under Uncertainty. <em>AI Magazine</em>, 43(2), 249–266. DOI: 10.1002/aaai.12053.</p>
+    <p><a href="https://doi.org/10.1002/aaai.12053" target="_blank" rel="noopener">https://doi.org/10.1002/aaai.12053</a> ｜ 开放全文：<a href="https://arxiv.org/abs/2008.08548" target="_blank" rel="noopener">arXiv:2008.08548</a></p>
+  </div>
+  </section>
+
 </main>
 
-<footer><div class="wrap">硕士生课程《人工智能的数学方法》· 第四讲 部分可观测决策与 POMDP · 公式由 MathJax 渲染</div></footer>
+<footer><div class="wrap">硕士生课程《人工智能数学方法（第三季）》· 第四讲 部分可观测决策与 POMDP · 2026年</div></footer>
 
 <script>
 const $ = id => document.getElementById(id);
