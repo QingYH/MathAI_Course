@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>第二讲 · MDP 与动态规划 | 人工智能的数学方法</title>
+<title>第二讲 · MDP 与动态规划 | 人工智能数学方法（第三季）</title>
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@600;700&display=swap">
 <script>
   window.MathJax = {
@@ -21,10 +21,10 @@
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html{scroll-behavior:smooth;}
-  body{font-family:"Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.85;-webkit-text-size-adjust:100%;}
+  body{font-family:"Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background-color:var(--bg);background-image:radial-gradient(circle at 1.5px 1.5px, rgba(37,99,168,.10) 1.4px, transparent 1.5px),linear-gradient(rgba(44,138,138,.045) 1px, transparent 1px),linear-gradient(90deg, rgba(44,138,138,.045) 1px, transparent 1px);background-size:34px 34px,34px 34px,34px 34px;color:var(--ink);font-size:19px;line-height:1.9;-webkit-text-size-adjust:100%;}
   .wrap{max-width:1080px;margin:0 auto;padding:0 18px;}
-  header.hero{background:linear-gradient(135deg,#2563a8 0%,#2c8a8a 100%);color:#fff;padding:46px 0 38px;}
-  header.hero .kicker{font-size:15px;letter-spacing:3px;opacity:.85;margin-bottom:10px;}
+  header.hero{background:radial-gradient(circle at 2px 2px, rgba(255,255,255,.13) 2px, transparent 2.6px),linear-gradient(135deg,#2563a8 0%,#2c8a8a 100%);background-size:46px 46px,cover;color:#fff;padding:46px 0 38px;}
+  header.hero .kicker{font-size:16px;letter-spacing:3px;opacity:.85;margin-bottom:10px;}
   header.hero h1{font-size:clamp(26px,4.5vw,38px);font-weight:900;letter-spacing:1px;}
   header.hero p{margin-top:12px;font-size:clamp(15px,2.2vw,18px);opacity:.92;max-width:760px;}
   .back-home{display:inline-flex;align-items:center;gap:8px;margin-top:20px;text-decoration:none;color:#fff;border:1px solid rgba(255,255,255,.5);padding:9px 18px;border-radius:999px;font-size:15px;}
@@ -34,32 +34,32 @@
   nav.toc a{display:inline-block;color:var(--primary);text-decoration:none;font-size:15px;padding:7px 13px;border-radius:20px;flex:0 0 auto;}
   nav.toc a:hover{background:var(--primary-soft);}
   section{padding:38px 0 8px;}
-  h2{font-size:clamp(22px,3.2vw,28px);font-weight:900;color:var(--primary);margin-bottom:16px;padding-left:14px;border-left:5px solid var(--accent);}
-  h3{font-size:19px;font-weight:700;color:var(--ink);margin:22px 0 10px;}
+  h2{font-size:clamp(24px,3.4vw,32px);font-weight:900;color:var(--primary);margin-bottom:16px;padding-left:14px;border-left:5px solid var(--accent);}
+  h3{font-size:21px;font-weight:700;color:var(--ink);margin:22px 0 10px;}
   p{margin:10px 0;}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin:18px 0;}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px;}
   .hl{background:var(--hl);color:var(--hl-ink);font-weight:700;padding:1px 6px;border-radius:5px;}
   .term{color:var(--primary);font-weight:700;}
-  .note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:16px;}
+  .note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:17.5px;}
   .formula{background:#fbfdff;border:1px dashed var(--line);border-radius:12px;padding:14px 16px;margin:14px 0;overflow-x:auto;}
   ul,ol{padding-left:24px;margin:10px 0;}
   li{margin:7px 0;}
   code{background:var(--primary-soft);color:var(--primary);padding:1px 6px;border-radius:5px;font-size:15px;font-family:"SFMono-Regular",Consolas,Menlo,monospace;}
   pre{background:#1f3346;color:#eaf3fb;border-radius:12px;padding:16px;overflow-x:auto;font-size:14.5px;line-height:1.7;margin:12px 0;font-family:"SFMono-Regular",Consolas,Menlo,monospace;}
   pre code{background:transparent;color:inherit;padding:0;}
-  table.data{border-collapse:collapse;width:100%;margin:12px 0;font-size:15.5px;}
+  table.data{border-collapse:collapse;width:100%;margin:12px 0;font-size:17px;}
   table.data th,table.data td{border:1px solid var(--line);padding:9px 12px;text-align:left;}
   table.data th{background:var(--primary-soft);color:var(--primary);}
   .demo-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:14px;}
   .demo-head h3{margin:0;}
-  .badge{display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:700;padding:3px 10px;border-radius:12px;}
-  button.btn{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:16px;font-weight:600;cursor:pointer;font-family:inherit;}
+  .badge{display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:15px;font-weight:700;padding:3px 10px;border-radius:12px;}
+  button.btn{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:18px;font-weight:600;cursor:pointer;font-family:inherit;}
   button.btn.secondary{background:var(--accent);}
   button.btn.ghost{background:#fff;color:var(--primary);border:1px solid var(--primary);}
   button.btn:active{transform:scale(.97);}
   .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0;}
-  .stat{font-size:16px;color:var(--sub);}
+  .stat{font-size:17.5px;color:var(--sub);}
   .stat b{color:var(--ink);}
   .gridworld{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:420px;margin:0 auto;}
   .cell{aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:15px;gap:2px;border:1px solid var(--line);background:#f2f7fb;}
@@ -68,8 +68,8 @@
   .cell.goal{background:#d8f3dc;border-color:#95d5a8;}
   .cell.pit{background:#fde2e2;border-color:#f3a6a6;}
   .cell.obstacle{background:#c9d4de;}
-  input.inp{font-family:inherit;font-size:16px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;}
-  .gen-output{min-height:60px;background:#fbfdff;border:1px solid var(--line);border-radius:12px;padding:14px;font-size:17px;line-height:1.9;}
+  input.inp{font-family:inherit;font-size:17.5px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;}
+  .gen-output{min-height:60px;background:#fbfdff;border:1px solid var(--line);border-radius:12px;padding:14px;font-size:18.5px;line-height:1.9;}
   button.btn.sel{background:var(--accent);color:#fff;border-color:var(--accent);}
   .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px;margin-top:14px;}
   .kv .box{background:#f6f8f7;border-radius:12px;padding:16px;}
@@ -82,9 +82,9 @@
   details .solution{padding:12px 16px;}
   .reveal{opacity:0;transform:translateY(26px);transition:opacity .65s ease,transform .65s ease;}
   .reveal.visible{opacity:1;transform:none;}
-  footer{padding:30px 0 50px;color:var(--sub);font-size:14px;text-align:center;}
+  footer{padding:30px 0 50px;color:var(--sub);font-size:15px;text-align:center;}
   @media (max-width:640px){
-    body{font-size:16px;}
+    body{font-size:17px;}
     .card{padding:16px;}
     header.hero{padding:34px 0 28px;}
     table.data{font-size:14px;}
@@ -95,7 +95,7 @@
 
 <header class="hero">
   <div class="wrap">
-    <div class="kicker">硕士生课程 · 人工智能的数学方法 · 第二讲</div>
+    <div class="kicker">硕士生课程 · 人工智能数学方法（第三季） · 智能体决策专题 · 第二讲</div>
     <h1>马尔可夫决策过程（MDP）与动态规划</h1>
     <p>在第一讲随机过程的基础上引入动作与奖励，把决策问题形式化为 MDP；建立价值函数与贝尔曼方程，并在环境模型已知的前提下，用策略迭代与值迭代等动态规划方法求解最优策略。</p>
     <a class="back-home" href="人工智能数学方法.html">← 返回课程首页</a>
@@ -213,6 +213,7 @@
     <div class="card reveal"><h3>案例 2：棋类与游戏 AI</h3><p>局面为状态，合法走法为动作，胜负与局面评分为奖励，价值函数估计每种走法的长期优劣。</p></div>
     <div class="card reveal"><h3>案例 3：库存管理</h3><p>库存水平为状态，补货量为动作，持有成本与缺货惩罚构成奖励，求长期成本最小的订货策略。</p></div>
     <div class="card reveal"><h3>案例 4：调度与排队</h3><p>队列负载为状态，派单 / 调度为动作，服务水平与等待成本为奖励，建模为 MDP 求最优调度规则。</p></div>
+    <div class="card reveal"><h3>案例 5：外卖骑手派单决策</h3><p>以骑手当前位置、负载与超时风险为状态，选择接哪一单、走哪条路线为动作，奖励由准时率、配送距离与顾客评分构成。平台在模型可估计时可用动态规划求出长期收益最优的派单规则；当路况与需求难以精确建模时，则过渡到第三讲的无模型强化学习。</p></div>
   </div>
 </section>
 
@@ -315,7 +316,7 @@
       <button class="btn secondary" id="invP1">策略：每日补 1 件</button>
       <button class="btn secondary" id="invP3">策略：补到 3 件</button>
       <button class="btn" id="invDay">模拟一天</button>
-      <button class="btn secondary" id="inv30">模拟 30 天</button>
+      <button class="btn secondary" id="invPlay">自动模拟 30 天</button>
       <button class="btn ghost" id="invReset">重置</button>
     </div>
     <div class="kv">
@@ -326,13 +327,15 @@
       <div class="box"><b>天数</b><span id="invDays">0</span></div>
       <div class="box"><b>累计缺货件数</b><span id="invShort">0</span></div>
     </div>
-    <div class="note">库存 MDP 的状态是库存水平，动作是补货量；最优补货策略正是通过策略迭代 / 值迭代，在“多备货压资金”与“缺货丢订单”之间取得长期成本最小的平衡。</div>
+    <canvas id="invCanvas" width="720" height="280" style="margin-top:14px;"></canvas>
+    <div class="note">库存 MDP 的状态是库存水平，动作是补货量；最优补货策略正是通过策略迭代 / 值迭代，在“多备货压资金”与“缺货丢订单”之间取得长期成本最小的平衡。蓝色折线为每日库存，橙色折线为累计成本（右轴刻度由程序自适应）。</div>
+    <div class="note" id="invAnalyze"></div>
   </div>
 </section>
 
 <!-- 10. AI 应用 -->
 <section id="sec-ai">
-  <h2 class="reveal">八、MDP 与动态规划在人工智能中的应用</h2>
+  <h2 class="reveal">十、MDP 与动态规划在人工智能中的应用</h2>
   <div class="grid">
     <div class="card reveal">
       <h3>8.1 机器人导航与控制</h3>
@@ -355,7 +358,7 @@
 
 <!-- 9. 练习 -->
 <section id="sec-exercise">
-  <h2 class="reveal">九、课堂练习（含详解）</h2>
+  <h2 class="reveal">十一、课堂练习（含详解）</h2>
   <div class="card reveal">
     <p>练习 1–3、5–6 为课堂手算 / 推导，练习 4、7 可在 30 分钟内用 Python 完成。每道题都附有可折叠的详细解答过程。</p>
 
@@ -427,13 +430,49 @@
       <p><strong>不补货：</strong>库存很快耗尽，缺货惩罚占主导，长期成本高；<strong>补到 3 件：</strong>缺货最少，但期末库存高，持有成本上升；<strong>每日补 1 件：</strong>在两者之间。需求期望为 $0.3\times0+0.5\times1+0.2\times2=0.9$ 件/天，因此长期补货量需接近期望需求才能平衡缺货与持有。最优订货点 / 订货量应由 MDP 求解得到，通常是一个“库存低于阈值就补货”的阈值策略，而不是固定每天补同样数量。</p>
     </div></details>
 
+    <h3>练习 8：单状态循环的折扣回报（手算题）</h3>
+    <p>仅有一个状态 $s$，执行动作后确定性地留在 $s$，每步获得相同即时奖励 $r=3$，折扣因子 $\gamma=0.9$。(1) 写出该状态价值满足的贝尔曼方程；(2) 解析求解 $V(s)$；(3) 说明当 $\gamma\to1$ 时 $V(s)$ 的变化及其含义。</p>
+    <details><summary>查看解答过程</summary><div class="solution">
+      <p><strong>(1) 贝尔曼方程：</strong>状态不转移，后继仍是自身，故</p>
+      <p>$$V(s)=r+\gamma V(s)=3+0.9V(s)$$</p>
+      <p><strong>(2) 求解：</strong>移项得 $(1-\gamma)V(s)=r$，因此</p>
+      <p>$$V(s)=\frac{r}{1-\gamma}=\frac{3}{1-0.9}=30$$</p>
+      <p>也可由折扣回报级数直接验证：$V=3+3\gamma+3\gamma^{2}+\cdots=\frac{3}{1-\gamma}=30$。</p>
+      <p><strong>(3) 极限含义：</strong>当 $\gamma\to1$ 时 $\frac{r}{1-\gamma}\to\infty$，即不打折时无限步恒定奖励的累积回报发散。这正是折扣因子要求 $\gamma<1$ 的原因：它既保证级数收敛，也使压缩映射的收缩系数 $\gamma<1$，从而价值迭代存在唯一不动点；$\gamma$ 越接近 1，智能体越看重远期回报，但收敛也越慢。</p>
+    </div></details>
+
     <div class="note">思考题：策略迭代每轮要做完整策略评估，值迭代把评估与改进合并。在状态空间很大时，为什么值迭代往往更易实现？两者各自的收敛代价如何？</div>
   </div>
 </section>
 
+<!-- 拓展阅读：代表性文献 -->
+  <section id="sec-refs">
+  <h2 class="reveal">十二、拓展阅读：代表性文献</h2>
+  <div class="card reveal">
+    <p>以下文献分为「经典奠基」与「近年进展（2021 年以来）」两组，各 2 篇与 3 篇；著录含作者、标题、期刊 / 出版社、卷号、期号、页码与年份，链接均为 DOI 持久标识或 arXiv / 官方存档，可直接访问。</p>
+    <h3>经典奠基文献</h3>
+    <h3>[1] A Markovian Decision Process <span class="badge">经典</span></h3>
+    <p>Bellman, R. (1957). A Markovian Decision Process. <em>Journal of Mathematics and Mechanics (现 Indiana University Mathematics Journal)</em>, 6(4), 679–684. DOI: 10.1512/iumj.1957.6.56038.</p>
+    <p><a href="https://doi.org/10.1512/iumj.1957.6.56038" target="_blank" rel="noopener">https://doi.org/10.1512/iumj.1957.6.56038</a></p>
+    <h3>[2] Markov Decision Processes: Discrete Stochastic Dynamic Programming <span class="badge">经典</span></h3>
+    <p>Puterman, M. L. (1994). Markov Decision Processes: Discrete Stochastic Dynamic Programming. <em>Wiley-Interscience, New York</em>.</p>
+    <p>ISBN 978-0471619826（经典专著，无在线 DOI）</p>
+    <h3>近年进展（2021 年以来）</h3>
+    <h3>[3] Model-based Reinforcement Learning: A Survey <span class="badge">近年</span></h3>
+    <p>Moerland, T. M., Broekens, J., Plaat, A., Jonker, C. M. (2023). Model-based Reinforcement Learning: A Survey. <em>Foundations and Trends in Machine Learning</em>, 16(1), 1–118. DOI: 10.1561/2200000086.</p>
+    <p><a href="https://doi.org/10.1561/2200000086" target="_blank" rel="noopener">https://doi.org/10.1561/2200000086</a> ｜ 开放全文：<a href="https://arxiv.org/abs/2006.16712" target="_blank" rel="noopener">arXiv:2006.16712</a></p>
+    <h3>[4] A Survey on Model-based Reinforcement Learning <span class="badge">近年</span></h3>
+    <p>Luo, F.-M., Xu, T., Lai, H., Chen, X.-H., Zhang, W., Yu, Y. (2024). A Survey on Model-based Reinforcement Learning. <em>Science China Information Sciences</em>, 67(2), 121101. DOI: 10.1007/s11432-022-3696-5.</p>
+    <p><a href="https://doi.org/10.1007/s11432-022-3696-5" target="_blank" rel="noopener">https://doi.org/10.1007/s11432-022-3696-5</a></p>
+    <h3>[5] Recent Progress in Reinforcement Learning and Adaptive Dynamic Programming for Advanced Control Applications <span class="badge">近年</span></h3>
+    <p>Wang, D., Gao, N., Liu, D., Li, J., Lewis, F. L. (2024). Recent Progress in Reinforcement Learning and Adaptive Dynamic Programming for Advanced Control Applications. <em>IEEE/CAA Journal of Automatica Sinica</em>, 11(1), 18–36. DOI: 10.1109/JAS.2023.123843.</p>
+    <p><a href="https://doi.org/10.1109/JAS.2023.123843" target="_blank" rel="noopener">https://doi.org/10.1109/JAS.2023.123843</a></p>
+  </div>
+  </section>
+
 </main>
 
-<footer><div class="wrap">硕士生课程《人工智能的数学方法》· 第二讲 MDP 与动态规划 · 公式由 MathJax 渲染</div></footer>
+<footer><div class="wrap">硕士生课程《人工智能数学方法（第三季）》· 第二讲 MDP 与动态规划 · 2026年</div></footer>
 
 <script>
 const $ = id => document.getElementById(id);
@@ -535,9 +574,10 @@ $('cmpA1').onclick=()=>cmpCalc('a1');
 $('cmpA2').onclick=()=>cmpCalc('a2');
 $('cmpReset').onclick=()=>{CMP.q={a1:null,a2:null};$('cmpOut').textContent='点击动作按钮，查看该动作的奖励、期望后继价值与 Q 值。';cmpCompare();};
 
-/* 演示 4：库存管理模拟 */
-const INV={stock:2,total:0,days:0,short:0,policy:'p0'};
+/* 演示 4：库存管理模拟（逐日动态 + 曲线） */
+const INV={stock:2,total:0,days:0,short:0,policy:'p0',hStock:[],hCost:[],hDemand:[],timer:null};
 const invBtns={p0:$('invP0'),p1:$('invP1'),p3:$('invP3')};
+const invPolicyName={p0:'不补货',p1:'每日补 1 件',p3:'补到 3 件'};
 function invDemand(){const r=Math.random();return r<0.3?0:(r<0.8?1:2);}
 function invOrder(){
   if(INV.policy==='p0')return 0;
@@ -552,19 +592,61 @@ function invDay(){
   const short=Math.max(0,demand-INV.stock);
   const cost=end*0.1+short*1.0;
   INV.stock=end;INV.total+=cost;INV.days++;INV.short+=short;
+  INV.hStock.push(end);INV.hCost.push(INV.total);INV.hDemand.push(demand);
   $('invDemand').textContent=demand;$('invStock').textContent=end;
   $('invCost').textContent=cost.toFixed(2);$('invTotal').textContent=INV.total.toFixed(2);
   $('invDays').textContent=INV.days;$('invShort').textContent=INV.short;
+  invChart();invAnalyze();
 }
+function invChart(){
+  const cv=$('invCanvas');const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height,pad=34;ctx.clearRect(0,0,W,H);
+  const n=INV.hStock.length;if(!n)return;
+  const maxCost=Math.max(1,...INV.hCost);
+  const X=i=>pad+(W-2*pad)*(n===1?0.5:i/(30-1));
+  const Ystock=v=>H-pad-(H-2*pad)*(v/3);
+  const Ycost=v=>H-pad-(H-2*pad)*(v/maxCost);
+  ctx.strokeStyle='#e6edf3';ctx.lineWidth=1;
+  for(let g=0;g<=3;g++){const y=Ystock(g);ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(W-pad,y);ctx.stroke();}
+  ctx.font='13px sans-serif';ctx.fillStyle='#51647a';
+  for(let g=0;g<=3;g++)ctx.fillText(g,6,Ystock(g)+4);
+  ctx.fillText('成本',W-pad-44,16);
+  // 库存蓝线
+  ctx.strokeStyle='#2f6db3';ctx.lineWidth=2.5;ctx.beginPath();
+  INV.hStock.forEach((v,i)=>{const x=X(i),y=Ystock(v);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
+  // 累计成本橙线
+  ctx.strokeStyle='#d98a2b';ctx.lineWidth=2.5;ctx.beginPath();
+  INV.hCost.forEach((v,i)=>{const x=X(i),y=Ycost(v);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
+  ctx.fillStyle='#2f6db3';ctx.fillText('库存',pad+4,H-10);
+  ctx.fillStyle='#d98a2b';ctx.fillText('累计成本',pad+58,H-10);
+}
+function invAnalyze(){
+  const box=$('invAnalyze');if(!box)return;
+  if(INV.days===0){box.textContent='点击“模拟一天”或“自动模拟 30 天”，观察库存波动与累计成本增长。';return;}
+  const avg=INV.total/INV.days;
+  const rate=INV.days? (INV.short/INV.days):0;
+  let tip='';
+  if(INV.policy==='p0')tip='不补货策略下库存很快被需求耗尽，缺货罚款（每件 1.0）远高于持有成本，长期日均成本偏高。';
+  else if(INV.policy==='p1')tip='每日补 1 件在缺货与持有之间折中，库存大致维持在低位运行，是较稳妥的中间策略。';
+  else tip='补到 3 件库存偏高，缺货少但每件每日 0.1 的持有成本累积较快，适合需求波动更大的情形。';
+  box.innerHTML=`结果解读：当前策略“${invPolicyName[INV.policy]}”已运行 ${INV.days} 天，累计成本 ${INV.total.toFixed(2)}，日均成本 ${avg.toFixed(3)}，累计缺货 ${INV.short} 件（平均每日缺货 ${rate.toFixed(2)} 件），期末库存 ${INV.stock} 件。${tip} 三种策略的成本权衡，正是值迭代 / 策略迭代在库存 MDP 中需要求解的长期最优问题。`;
+}
+function invStop(){if(INV.timer){clearInterval(INV.timer);INV.timer=null;$('invPlay').textContent='自动模拟 30 天';}}
 function invSetPolicy(p){INV.policy=p;Object.values(invBtns).forEach(b=>b.classList.remove('sel'));invBtns[p].classList.add('sel');}
-$('invP0').onclick=()=>invSetPolicy('p0');
-$('invP1').onclick=()=>invSetPolicy('p1');
-$('invP3').onclick=()=>invSetPolicy('p3');
-$('invDay').onclick=invDay;
-$('inv30').onclick=()=>{for(let k=0;k<30;k++)invDay();};
-$('invReset').onclick=()=>{INV.stock=2;INV.total=0;INV.days=0;INV.short=0;invSetPolicy('p0');
+$('invP0').onclick=()=>{invStop();invSetPolicy('p0');};
+$('invP1').onclick=()=>{invStop();invSetPolicy('p1');};
+$('invP3').onclick=()=>{invStop();invSetPolicy('p3');};
+$('invDay').onclick=()=>{invStop();invDay();};
+$('invPlay').onclick=()=>{
+  if(INV.timer){invStop();return;}
+  $('invPlay').textContent='暂停';
+  INV.timer=setInterval(()=>{if(INV.days>=30){invStop();return;}invDay();},300);
+};
+$('invReset').onclick=()=>{invStop();INV.stock=2;INV.total=0;INV.days=0;INV.short=0;INV.hStock=[];INV.hCost=[];INV.hDemand=[];invSetPolicy('p0');
   $('invDemand').textContent='—';$('invStock').textContent='2';$('invCost').textContent='0.00';
-  $('invTotal').textContent='0.00';$('invDays').textContent='0';$('invShort').textContent='0';};
+  $('invTotal').textContent='0.00';$('invDays').textContent='0';$('invShort').textContent='0';
+  invChart();invAnalyze();};
+invAnalyze();
 </script>
 </body>
 </html>
