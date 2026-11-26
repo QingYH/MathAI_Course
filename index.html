@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>人工智能的数学方法 · 研究生课程</title>
+<title>人工智能数学方法（第三季） · 研究生课程</title>
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@600;700&display=swap">
 <style>
   :root{
@@ -14,23 +14,23 @@
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html{scroll-behavior:smooth;}
-  body{font-family:"Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.85;}
+  body{font-family:"Noto Sans SC",-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background-color:var(--bg);background-image:radial-gradient(circle at 1.5px 1.5px, rgba(37,99,168,.10) 1.4px, transparent 1.5px),linear-gradient(rgba(44,138,138,.045) 1px, transparent 1px),linear-gradient(90deg, rgba(44,138,138,.045) 1px, transparent 1px);background-size:34px 34px,34px 34px,34px 34px;color:var(--ink);font-size:19px;line-height:1.9;}
   .wrap{max-width:1080px;margin:0 auto;padding:0 18px;}
-  header.hero{background:linear-gradient(135deg,#2563a8 0%,#2c8a8a 100%);color:#fff;padding:50px 0 40px;}
-  header.hero .kicker{font-size:15px;letter-spacing:3px;opacity:.85;margin-bottom:10px;}
+  header.hero{background:radial-gradient(circle at 2px 2px, rgba(255,255,255,.13) 2px, transparent 2.6px),linear-gradient(135deg,#2563a8 0%,#2c8a8a 100%);background-size:46px 46px,cover;color:#fff;padding:50px 0 40px;}
+  header.hero .kicker{font-size:16px;letter-spacing:3px;opacity:.85;margin-bottom:10px;}
   header.hero h1{font-size:clamp(26px,4.5vw,38px);font-weight:900;letter-spacing:1px;}
   header.hero p{margin-top:12px;font-size:clamp(15px,2.2vw,18px);opacity:.92;max-width:780px;}
-  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:24px;font-size:15px;color:#e6eef5;}
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:24px;font-size:17px;color:#e6eef5;}
   .flow b{color:#f2e6c8;}
   .flow .sep{opacity:.5;}
   section{padding:38px 0 8px;}
-  h2{font-size:clamp(22px,3.2vw,28px);font-weight:900;color:var(--primary);margin-bottom:16px;padding-left:14px;border-left:5px solid var(--accent);}
+  h2{font-size:clamp(24px,3.4vw,32px);font-weight:900;color:var(--primary);margin-bottom:16px;padding-left:14px;border-left:5px solid var(--accent);}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:12px;transition:transform .25s ease,box-shadow .25s ease;}
   .card:hover{transform:translateY(-6px);box-shadow:0 16px 34px rgba(37,99,168,.16);}
-  .badge{display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:700;padding:3px 12px;border-radius:12px;align-self:flex-start;}
-  .card h3{font-size:19px;font-weight:700;}
-  .card p{color:var(--sub);font-size:15.5px;flex:1;}
+  .badge{display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:15px;font-weight:700;padding:3px 12px;border-radius:12px;align-self:flex-start;}
+  .card h3{font-size:21px;font-weight:700;}
+  .card p{color:var(--sub);font-size:17px;flex:1;}
   .card .go{font-weight:700;color:var(--primary);display:inline-flex;align-items:center;gap:8px;}
   .card .go::after{content:"→";transition:transform .25s ease;}
   .card:hover .go::after{transform:translateX(6px);}
@@ -38,17 +38,18 @@
   .c2{border-top:4px solid #2c8a8a;} .c2 .badge{background:#e4f3f2;color:#2c8a8a;}
   .c3{border-top:4px solid #d99a4a;} .c3 .badge{background:#fbf1da;color:#b07a26;}
   .c4{border-top:4px solid #7a5c8e;} .c4 .badge{background:#efe8f4;color:#7a5c8e;}
-  .note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:16px;color:var(--sub);}
-  footer{padding:30px 0 50px;color:var(--sub);font-size:14px;text-align:center;}
-  @media (max-width:640px){body{font-size:16px;}header.hero{padding:34px 0 28px;}.card{padding:18px;}}
+  .note{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:17.5px;color:var(--sub);}
+  footer{padding:30px 0 50px;color:var(--sub);font-size:15px;text-align:center;}
+  @media (max-width:640px){body{font-size:17px;}header.hero{padding:34px 0 28px;}.card{padding:18px;}}
 </style>
 </head>
 <body>
 
 <header class="hero">
   <div class="wrap">
-    <div class="kicker">硕士生课程 · 人工智能的数学方法</div>
-    <h1>人工智能的数学方法(系列3)</h1>
+    <div class="kicker">硕士生课程 · 第三季 · 智能体决策专题</div>
+    <h1>人工智能数学方法（第三季）</h1>
+    <p style="font-size:20px;font-weight:700;color:var(--accent);margin:4px 0 10px;">第三季 · 智能体序贯决策专题</p>
     <p>课程围绕「随机过程 → 序贯决策 → 无模型学习 → 部分可观测决策」主线展开，从马尔科夫链的概率建模，到 MDP 的动态规划求解、Q-learning 交互学习，再到 HMM 与 POMDP 的信念决策。每一讲配有数学原理、经典案例、可交互动态演示、AI 应用与课堂练习。</p>
     <div class="flow">
       <b>决策主线</b>
@@ -64,25 +65,25 @@
   <div class="wrap">
     <h2>课程讲次</h2>
     <div class="grid">
-      <a class="card c1" href="lecture1.html">
+      <a class="card c1" href="第一讲-马尔科夫过程与马尔科夫链.html">
         <span class="badge">第一讲</span>
         <h3>马尔科夫过程与马尔科夫链</h3>
         <p>马尔可夫性、转移矩阵、C–K 方程、状态分类与平稳分布；分布演化、平稳分布求解、bigram 文本生成与 PageRank 随机游走演示。</p>
         <span class="go">进入本讲</span>
       </a>
-      <a class="card c2" href="lecture2.html">
+      <a class="card c2" href="第二讲-MDP与动态规划.html">
         <span class="badge">第二讲</span>
         <h3>MDP 与动态规划</h3>
         <p>五元组、策略与回报、V/Q 价值函数、贝尔曼期望与最优方程、压缩映射；策略评估 / 改进 / 策略迭代 / 值迭代与网格世界值迭代演示。</p>
         <span class="go">进入本讲</span>
       </a>
-      <a class="card c3" href="lecture3.html">
+      <a class="card c3" href="第三讲-强化学习与Q-learning.html">
         <span class="badge">第三讲</span>
         <h3>强化学习与 Q-learning</h3>
         <p>无模型设定、MC 与 TD、动作价值、离策略、ε-贪心与收敛条件；一步 Q 更新计算器与网格世界在线学习、回合回报曲线演示。</p>
         <span class="go">进入本讲</span>
       </a>
-      <a class="card c4" href="lecture4.html">
+      <a class="card c4" href="第四讲-部分可观测决策与POMDP.html">
         <span class="badge">第四讲</span>
         <h3>部分可观测决策与 POMDP</h3>
         <p>HMM 三问题、前向与 Viterbi 算法、观测函数、信念状态与贝叶斯更新、信念 MDP 与近似求解；前向 / 解码 / 定位 / 信念更新四个交互演示。</p>
@@ -93,7 +94,7 @@
   </div>
 </section>
 
-<footer><div class="wrap">硕士生课程《人工智能的数学方法(系列3)》· 四讲教学网页 ·2026年</div></footer>
+<footer><div class="wrap">硕士生课程《人工智能数学方法（第三季）》· 四讲教学网页 · 2026年</div></footer>
 
 </body>
 </html>
